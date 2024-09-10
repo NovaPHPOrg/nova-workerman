@@ -6,11 +6,20 @@ class Adapter
 {
     static function Init(Request $request,$config)
     {
-        global $req;
 
-        $req = $request;
+
+        self::loadFunctions();
 
         self::InitServerVar($request,$config);
+    }
+
+    static function loadFunctions(): void
+    {
+        require_once __DIR__ . "/functions/CommonFunctions.php";
+        require_once __DIR__ . "/functions/SessionFunctions.php";
+        require_once __DIR__ . "/functions/CookieFunctions.php";
+        require_once __DIR__ . "/functions/HttpFunctions.php";
+
     }
 
 
@@ -72,6 +81,11 @@ class Adapter
         }
         $_REQUEST = array_merge($_GET,$_POST);
         $_SESSION = [];
+
+        if (session_status() == PHP_SESSION_ACTIVE){
+            $_SESSION = $request->session->all();
+        }
+
         $_ENV = [];
         $_SERVER['CONTENT_LENGTH'] = $request->header('content-length') ?? 0;
         $_SERVER['CONTENT_TYPE'] = $request->header('content-type') ?? "";
