@@ -1,5 +1,7 @@
 <?php
 
+use nova\framework\App;
+use nova\framework\log\Logger;
 use Workerman\Protocols\Http\Request;
 
 class Adapter
@@ -89,5 +91,11 @@ class Adapter
         $_ENV = [];
         $_SERVER['CONTENT_LENGTH'] = $request->header('content-length') ?? 0;
         $_SERVER['CONTENT_TYPE'] = $request->header('content-type') ?? "";
+    }
+
+    static function Destroy(): void
+    {
+        $instance = App::getInstance();
+        unset($instance);
     }
 }

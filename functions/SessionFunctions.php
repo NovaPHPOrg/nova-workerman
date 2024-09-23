@@ -183,6 +183,8 @@ if (!function_exists('session_write_close')) {
         // — Write session data and end session
         /* @var Request $req */
         [$req,$rep] = getHttpConnection();
-        $req->session->save();
+
+        $req->session?->save();
+
     }
 }

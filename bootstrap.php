@@ -16,8 +16,7 @@ $http_worker->name = 'Nova WorkerMan';
 $http_worker->count = $config['workers'];
 
 $http_worker->onWorkerStart = function ($worker) {
-    global $config;
-    echo "Worker started at {$config['ip']}:{$config['port']}\n";
+
 };
 
 $http_connections = [];
@@ -26,7 +25,6 @@ function getHttpConnection()
 {
     // 获取当前进程的id
     $id = getmypid();
-
     global $http_connections;
     if (isset($http_connections[$id])) {
         return $http_connections[$id];
@@ -48,7 +46,11 @@ $http_worker->onMessage = function ($connection, $request) {
 
     Adapter::Init($request,$config);
     include_once __DIR__."/../../../public/index.php";
-    $connection->send($rep->withBody(ob_get_clean()));
+    $result  = ob_get_clean();
+    var_dump($result);
+    Adapter::Destroy();
+    $rep->withBody($result);
+    $connection->send($rep);
     unset($http_connections[$id]);
 };
 
