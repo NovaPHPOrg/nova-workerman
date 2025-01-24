@@ -2,12 +2,11 @@
 
 namespace nova\plugin\workerman;
 
-use Adapter;
-use Workerman\Protocols\Http\Response;
+use Workerman\Connection\TcpConnection;
 use Workerman\Worker;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
-$config = require __DIR__ . '/../../../workerman.php';
+require __DIR__ . '/start.php';
+$config = require __DIR__ . '/../../../config.php';
 // #### http worker ####
 $http_worker = new Worker("http://{$config['ip']}:{$config['port']}");
 
@@ -19,39 +18,18 @@ $http_worker->onWorkerStart = function ($worker) {
 
 };
 
-$http_connections = [];
-
-function getHttpConnection()
-{
-    // 获取当前进程的id
-    $id = getmypid();
-    global $http_connections;
-    if (isset($http_connections[$id])) {
-        return $http_connections[$id];
-    }
-    return [null,null];
-}
-
+Adapter::import();
 // Emitted when data received
-$http_worker->onMessage = function ($connection, $request) {
-    global $config,$http_connections;
-    ob_start();
-    include_once  __DIR__ ."/start.php";
-
-    $rep = new Response(200);
-    $req = $request;
-    $id = getmypid();
-
-    $http_connections[$id] = [$req,$rep];
-
-    Adapter::Init($request,$config);
+$http_worker->onMessage = function (TcpConnection $connection, $request) {
+    global $config;
+    $context = new Context($request,$config);
+    $adapter = new Adapter($context);
+    $id = $connection->worker->id;
+    $adapter->initServerVar();
     include_once __DIR__."/../../../public/index.php";
-    $result  = ob_get_clean();
-    var_dump($result);
-    Adapter::Destroy();
-    $rep->withBody($result);
-    $connection->send($rep);
-    unset($http_connections[$id]);
+    $adapter->destroy();
+    $connection->send($context->getResponse());
+    $connection->destroy();
 };
 
 // Run all workers
