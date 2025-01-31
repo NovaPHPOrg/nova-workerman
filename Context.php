@@ -1,36 +1,26 @@
 <?php
-namespace nova\plugin\workerman;
-use Workerman\Protocols\Http\Request;
-use Workerman\Protocols\Http\Response;
 
-/**
- * Web应用的上下文
- */
 class Context
 {
-    protected Request $request;
-    protected Response $response;
-    protected array $config;
+    private static array $context = [];
 
-    public function __construct(Request $request,array $config)
+    public static function set(string $key, $value): void
     {
-        $this->request = $request;
-        $this->config = $config;
-        $this->response = new Response();
+        self::$context[$key] = $value;
     }
 
-    public function config($key)
+    public static function get(string $key)
     {
-        return $this->config[$key] ?? null;
+        return self::$context[$key] ?? null;
     }
 
-    public function getRequest(): Request
+    public static function has(string $key): bool
     {
-        return $this->request;
+        return isset(self::$context[$key]);
     }
 
-    public function getResponse(): Response
+    public static function remove(string $key): void
     {
-        return $this->response;
+        unset(self::$context[$key]);
     }
 }

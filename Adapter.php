@@ -1,35 +1,32 @@
 <?php
-namespace nova\plugin\workerman;
-use nova\framework\App;
+
+use Workerman\Protocols\Http\Request;
 
 class Adapter
 {
-    protected Context $context;
-    public function __construct(Context $context)
+    static function Init(Request $request,$config): void
     {
-        $this->context = $context;
+
+
+        self::loadFunctions();
+
+        self::InitServerVar($request,$config);
     }
 
-    static function import(): void
+    static function loadFunctions(): void
     {
         require_once __DIR__ . "/functions/CommonFunctions.php";
         require_once __DIR__ . "/functions/SessionFunctions.php";
         require_once __DIR__ . "/functions/CookieFunctions.php";
         require_once __DIR__ . "/functions/HttpFunctions.php";
+
     }
 
 
 
-
-
-
-
-
-
-    function initServerVar(): void
+    static function InitServerVar(Request $request,$config): void
     {
         $hostname = gethostname();
-        $request = $this->context->getRequest();
         $_SERVER = [
             "PHP_SELF"=> __DIR__ . "/../../../public/index.php",
             "SCRIPT_NAME"=> "/index.php",
@@ -51,7 +48,7 @@ class Adapter
             "REDIRECT_REMOTE_USER"=>"",
             "SCRIPT_FILENAME"=>__DIR__ . "/../../../public/index.php",
             "SERVER_ADMIN"=>"",
-            "SERVER_PORT"=>$this->context->config('port'),
+            "SERVER_PORT"=>$config['port'],
             "SERVER_SIGNATURE"=>"",
             "PATH_TRANSLATED"=>"",
             "REQUEST_URI" => $request->uri(),
@@ -62,22 +59,26 @@ class Adapter
         foreach ($request->header() as $key => $value) {
             $_SERVER["HTTP_".str_replace("-","_",strtoupper($key))] = $value;
         }
+        $_COOKIE = [];
         // 处理cookie
-        $_COOKIE = array_map(function ($value) {
-            return $value;
-        }, $request->cookie());
+        foreach ($request->cookie() as $key => $value) {
+            $_COOKIE[$key] = $value;
+        }
+        $_GET = [];
         // 处理get
-        $_GET = array_map(function ($value) {
-            return $value;
-        }, $request->get());
+        foreach ($request->get() as $key => $value) {
+            $_GET[$key] = $value;
+        }
+        $_POST = [];
         // 处理post
-        $_POST = array_map(function ($value) {
-            return $value;
-        }, $request->post());
+        foreach ($request->post() as $key => $value) {
+            $_POST[$key] = $value;
+        }
+        $_FILES = [];
         // 处理files
-        $_FILES = array_map(function ($value) {
-            return $value;
-        }, $request->file());
+        foreach ($request->file() as $key => $value) {
+            $_FILES[$key] = $value;
+        }
         $_REQUEST = array_merge($_GET,$_POST);
         $_SESSION = [];
 
@@ -88,11 +89,5 @@ class Adapter
         $_ENV = [];
         $_SERVER['CONTENT_LENGTH'] = $request->header('content-length') ?? 0;
         $_SERVER['CONTENT_TYPE'] = $request->header('content-type') ?? "";
-    }
-
-    function destroy(): void
-    {
-        $instance = App::getInstance();
-        unset($instance);
     }
 }

@@ -40,7 +40,7 @@ if (!function_exists('headers_list')) {
     {
         /* @var Response $rep */
         [$req,$rep] = getHttpConnection();
-        return $rep->getHeaders();
+        return $req->getHeaders();
     }
 }
 
@@ -49,7 +49,7 @@ if (!function_exists('http_response_code')) {
     {
         /* @var Response $rep */
         [$req,$rep] = getHttpConnection();
-         $rep->withStatus($response_code);
+        $rep = $rep->withStatus($response_code);
          return $response_code;
     }
 }

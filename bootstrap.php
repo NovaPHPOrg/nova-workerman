@@ -2,10 +2,11 @@
 
 namespace nova\plugin\workerman;
 
-use Workerman\Connection\TcpConnection;
+use Adapter;
+use Workerman\Protocols\Http\Response;
 use Workerman\Worker;
 
-require __DIR__ . '/start.php';
+include_once  __DIR__ ."/start.php";
 $config = require __DIR__ . '/../../../config.php';
 // #### http worker ####
 $http_worker = new Worker("http://{$config['ip']}:{$config['port']}");
@@ -15,21 +16,37 @@ $http_worker->name = 'Nova WorkerMan';
 $http_worker->count = $config['workers'];
 
 $http_worker->onWorkerStart = function ($worker) {
-
+    global $config;
+    $pid = getmypid();
+    echo "Worker started at {$config['ip']}:{$config['port']},pid:{$pid}\n";
 };
 
-Adapter::import();
+$http_connections = [];
+
+function getHttpConnection()
+{
+    // 获取当前进程的id
+    $id = getmypid();
+    echo "getHttpConnection id:{$id}\n";
+    global $http_connections;
+    if (isset($http_connections[$id])) {
+        return $http_connections[$id];
+    }
+    return [null,null];
+}
+
 // Emitted when data received
-$http_worker->onMessage = function (TcpConnection $connection, $request) {
-    global $config;
-    $context = new Context($request,$config);
-    $adapter = new Adapter($context);
-    $id = $connection->worker->id;
-    $adapter->initServerVar();
+$http_worker->onMessage = function ($connection, $request) {
+    global $config,$http_connections;
+    ob_start();
+    $rep = new Response(200);
+    $req = $request;
+    $id = getmypid();
+    $http_connections[$id] = [$req,$rep];
+    Adapter::Init($request,$config);
     include_once __DIR__."/../../../public/index.php";
-    $adapter->destroy();
-    $connection->send($context->getResponse());
-    $connection->destroy();
+    $connection->send($rep->withBody(ob_get_clean()));
+    unset($http_connections[$id]);
 };
 
 // Run all workers
