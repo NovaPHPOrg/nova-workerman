@@ -2,51 +2,58 @@
 
 namespace nova\plugin\workerman;
 
-use Adapter;
-use Workerman\Protocols\Http\Response;
+
+use Workerman\Connection\TcpConnection;
+use Workerman\Protocols\Http\Request;
 use Workerman\Worker;
 
-include_once  __DIR__ ."/start.php";
-$config = require __DIR__ . '/../../../config.php';
+require_once  __DIR__ ."/start.php";
+$config = require_once __DIR__ . '/../../../config.php';
+Adapter::loadFunctions();
 // #### http worker ####
 $http_worker = new Worker("http://{$config['ip']}:{$config['port']}");
 
 $http_worker->name = 'Nova WorkerMan';
-// 获取CPU核心
-$http_worker->count = $config['workers'];
+// 获取CPU核心数量，根据实际情况设置
+$cpuCount = cpu_count();
+$http_worker->count = $cpuCount * 2;  // 一般建议设置为CPU核心数的1-2倍
 
-$http_worker->onWorkerStart = function ($worker) {
-    global $config;
+
+$http_worker->onWorkerStart = function ($worker) use ($config) {
     $pid = getmypid();
     echo "Worker started at {$config['ip']}:{$config['port']},pid:{$pid}\n";
 };
 
-$http_connections = [];
-
-function getHttpConnection()
-{
-    // 获取当前进程的id
-    $id = getmypid();
-    echo "getHttpConnection id:{$id}\n";
-    global $http_connections;
-    if (isset($http_connections[$id])) {
-        return $http_connections[$id];
-    }
-    return [null,null];
-}
 
 // Emitted when data received
-$http_worker->onMessage = function ($connection, $request) {
-    global $config,$http_connections;
-    ob_start();
-    $rep = new Response(200);
-    $req = $request;
-    $id = getmypid();
-    $http_connections[$id] = [$req,$rep];
-    Adapter::Init($request,$config);
-    include_once __DIR__."/../../../public/index.php";
-    $connection->send($rep->withBody(ob_get_clean()));
-    unset($http_connections[$id]);
+$http_worker->onMessage = function (TcpConnection $connection,Request $request) {
+    static $count;
+    if ($count === null) {
+        $count = 0;
+    }
+    $count++;
+    
+    try {
+        Adapter::InitServerVar($request);
+        global $workermanApp;
+        $workermanApp = new WorkermanApp($request);
+        $response = $workermanApp->run();
+        $connection->send($response);
+    } catch (\Throwable $e) {
+        // 错误处理
+        $connection->send("Internal Server Error: " . $e->getMessage());
+    } finally {
+        $workermanApp = null;
+    }
+
+
+    // 优化内存管理策略
+    if ($count % 1000 === 0) {  // 调整为更合理的频率
+        gc_collect_cycles();
+        if (memory_get_usage() > 128 * 1024 * 1024) {  // 设置内存上限，例如128MB
+            exit(0);
+        }
+    }
 };
 
 // Run all workers

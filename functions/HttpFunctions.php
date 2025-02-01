@@ -4,17 +4,13 @@
  */
 // header,header_remove,headers_sent,headers_list,http_response_code
 
-use Workerman\Protocols\Http\Request;
-use Workerman\Protocols\Http\Response;
-use function nova\plugin\workerman\getHttpConnection;
+use nova\plugin\workerman\WorkermanApp;
 
 if (!function_exists('header')) {
     function header($string, bool $replace = true, int $http_response_code = null): void
     {
-        /* @var Response $rep */
-        [$req,$rep] = getHttpConnection();
         [$key, $value] = explode(':', $string, 2);
-        $rep->header($key, $value);
+        WorkermanApp::instance()->header($key, $value);
         if ($http_response_code !== null) {
             http_response_code($http_response_code);
         }
@@ -38,18 +34,35 @@ if (!function_exists('headers_sent')) {
 if (!function_exists('headers_list')) {
     function headers_list(): array
     {
-        /* @var Response $rep */
-        [$req,$rep] = getHttpConnection();
-        return $req->getHeaders();
+        return WorkermanApp::instance()->getHeaders();
     }
 }
 
 if (!function_exists('http_response_code')) {
-    function http_response_code(int $response_code = null): int
+    function http_response_code(int $response_code = 200): int
     {
-        /* @var Response $rep */
-        [$req,$rep] = getHttpConnection();
-        $rep = $rep->withStatus($response_code);
+        WorkermanApp::instance()->setResponseCode($response_code);
          return $response_code;
+    }
+}
+
+
+if (! function_exists('getallheaders')) { // It's declared in a dev lib
+    /**
+     * Fetch all HTTP request headers
+     *
+     * @return array<string,string>
+     * @link https://www.php.net/manual/en/function.getallheaders.php
+     */
+    function getallheaders(): array
+    {
+        $headers = [];
+        foreach ($_SERVER as $key => $value) {
+            if (str_starts_with($key, 'HTTP_')) {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))))] = $value;
+            }
+        }
+
+        return $headers;
     }
 }

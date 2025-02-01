@@ -1,17 +1,9 @@
 <?php
-
+namespace nova\plugin\workerman;
 use Workerman\Protocols\Http\Request;
 
 class Adapter
 {
-    static function Init(Request $request,$config): void
-    {
-
-
-        self::loadFunctions();
-
-        self::InitServerVar($request,$config);
-    }
 
     static function loadFunctions(): void
     {
@@ -23,12 +15,12 @@ class Adapter
     }
 
 
-
-    static function InitServerVar(Request $request,$config): void
+    static function InitServerVar(Request $request): void
     {
+        $dir  = dirname(__DIR__, 3);
         $hostname = gethostname();
         $_SERVER = [
-            "PHP_SELF"=> __DIR__ . "/../../../public/index.php",
+            "PHP_SELF"=>  "$dir/public/index.php",
             "SCRIPT_NAME"=> "/index.php",
             "GATEWAY_INTERFACE"=>"CGI/1.1",
             "SERVER_ADDR"=>gethostbyname($hostname),
@@ -39,16 +31,16 @@ class Adapter
             "REQUEST_TIME"=>time(),
             "REQUEST_TIME_FLOAT"=>microtime(true),
             "QUERY_STRING"=>parse_url($request->uri(), PHP_URL_QUERY),
-            "DOCUMENT_ROOT"=>__DIR__ . "/../../../public",
+            "DOCUMENT_ROOT"=> "$dir/public",
             "HTTPS"=>str_starts_with($request->uri(), 'https') ? 'on' : '',
-            "REMOTE_ADDR"=>$request->header('x-real-ip') ?? $request->header('x-forwarded-for') ?? $request->header('remote_addr') ?? $request->header('remote_addr'),
-            "REMOTE_HOST"=>$request->header('remote_host') ?? "",
-            "REMOTE_PORT"=>$request->header('remote_port') ?? "",
+            "REMOTE_ADDR"=>$request->connection->getRemoteAddress(),
+            "REMOTE_HOST"=>$request->connection->getRemoteIp(),
+            "REMOTE_PORT"=>$request->connection->getRemotePort(),
             "REMOTE_USER"=>"",
             "REDIRECT_REMOTE_USER"=>"",
-            "SCRIPT_FILENAME"=>__DIR__ . "/../../../public/index.php",
+            "SCRIPT_FILENAME"=>__DIR__ . "$dir/public/index.php",
             "SERVER_ADMIN"=>"",
-            "SERVER_PORT"=>$config['port'],
+            "SERVER_PORT"=>$request->connection->getLocalPort(),
             "SERVER_SIGNATURE"=>"",
             "PATH_TRANSLATED"=>"",
             "REQUEST_URI" => $request->uri(),
@@ -83,10 +75,14 @@ class Adapter
         $_SESSION = [];
 
         if (session_status() == PHP_SESSION_ACTIVE){
-            $_SESSION = $request->session->all();
+            try {
+                $_SESSION = $request->session()->all();
+            } catch (\Exception $e) {
+                $_SESSION = [];
+            }
         }
 
-        $_ENV = [];
+        //$_ENV = [];
         $_SERVER['CONTENT_LENGTH'] = $request->header('content-length') ?? 0;
         $_SERVER['CONTENT_TYPE'] = $request->header('content-type') ?? "";
     }

@@ -3,15 +3,16 @@
  * Session 相关功能重写
  */
 
+use nova\plugin\workerman\WorkermanApp;
 use Random\RandomException;
 use Workerman\Protocols\Http\Request;
 use Workerman\Protocols\Http\Session;
 use Workerman\Protocols\Http\Session\FileSessionHandler;
-use function nova\plugin\workerman\getHttpConnection;
 
 
 if (!function_exists('session_commit')) {
-    function session_commit(){
+    function session_commit(): void
+    {
         session_write_close();
         // — session_write_close 的别名
     }
@@ -19,30 +20,29 @@ if (!function_exists('session_commit')) {
 
 if (!function_exists('session_create_id')) {
     /**
-     * @throws RandomException
+     * @throws RandomException|Exception
      */
-    function session_create_id(){
+    function session_create_id(): string
+    {
         return \bin2hex(pack('d', microtime(true)) . random_bytes(8));
     }
 }
 
 
 if (!function_exists('session_destroy')) {
-    function session_destroy(){
+    function session_destroy(): void
+    {
         // — 销毁一个会话中的全部数据
-        /* @var Request $req */
-        [$req,$rep] = getHttpConnection();
-        $req->session->flush();
+        WorkermanApp::instance()->session()?->flush();
     }
 }
 
 
 
 if (!function_exists('session_gc')) {
-    function session_gc(){
-        /* @var Request $req */
-        [$req,$rep] = getHttpConnection();
-        $req->session->gc();
+    function session_gc(): void
+    {
+        WorkermanApp::instance()->session()?->gc();
         // — Perform session data garbage collection
     }
 }
@@ -64,8 +64,11 @@ if (!function_exists('session_get_cookie_params')) {
 if (!function_exists('session_id')) {
     function session_id($id = null){
         /* @var Request $req */
-        [$req,$rep] = getHttpConnection();
-        return  $req->sessionId($id);
+        try {
+            WorkermanApp::instance()->request()->sessionId($id);
+        } catch (Exception $e) {
+            return '';
+        }
     }
 }
 
@@ -150,10 +153,9 @@ if (!function_exists('session_set_save_handler')) {
 }
 
 if (!function_exists('session_start')) {
-    function session_start(){
-        /* @var Request $req */
-        [$req,$rep] = getHttpConnection();
-        $req->session();
+    function session_start(): void
+    {
+        WorkermanApp::instance()->session();
     }
 }
 
@@ -161,12 +163,14 @@ if (!function_exists('session_status')) {
     function session_status(): int
     {
         // — 返回当前会话状态
-        /* @var Request $req */
-        [$req,$rep] = getHttpConnection();
-        if ($req->session == null) {
+        try {
+            if (WorkermanApp::instance()->session() == null) {
+                return PHP_SESSION_NONE;
+            }else{
+                return PHP_SESSION_ACTIVE;
+            }
+        }catch (Exception $e){
             return PHP_SESSION_NONE;
-        }else{
-            return PHP_SESSION_ACTIVE;
         }
     }
 }
@@ -179,12 +183,9 @@ if (!function_exists('session_unset')) {
 }
 
 if (!function_exists('session_write_close')) {
-    function session_write_close(){
-        // — Write session data and end session
-        /* @var Request $req */
-        [$req,$rep] = getHttpConnection();
-
-        $req->session?->save();
+    function session_write_close(): void
+    {
+        WorkermanApp::instance()->session()?->save();
 
     }
 }

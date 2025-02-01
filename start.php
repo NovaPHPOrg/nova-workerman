@@ -11,3 +11,9 @@ spl_autoload_register(function ($class) {
         require_once $file;
     }
 });
+
+$dir = dirname(__DIR__, 3);
+
+if(file_exists(  "$dir/vendor/autoload.php")){
+    require_once "$dir/vendor/autoload.php";
+}
