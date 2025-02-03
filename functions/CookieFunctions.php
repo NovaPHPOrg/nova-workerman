@@ -4,8 +4,7 @@
  */
 
 // setcookie
-use nova\plugin\workerman\WorkermanApp;
-use Workerman\Protocols\Http\Response;
+use adapter\WorkermanApp;
 
 if (!function_exists('setcookie')) {
     function setcookie(string $name, string $value = "", int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false ): bool {

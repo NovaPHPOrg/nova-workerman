@@ -4,12 +4,23 @@
  */
 
 // set_time_limit
+use adapter\WorkermanApp;
+use Workerman\Connection\TcpConnection;
+
 if (!function_exists('set_time_limit')) {
     function set_time_limit(int $seconds): bool
     {
         // Disable set_time_limit to not stop the worker
         // by default CLI sapi use 0 (unlimited)
         return true;
+    }
+}
+
+if (!function_exists('connection_aborted')){
+    function connection_aborted(): bool
+    {
+        return WorkermanApp::instance()->connection()->getStatus() !== TcpConnection::STATUS_ESTABLISHED;
+
     }
 }
 function cpu_count(): int

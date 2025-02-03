@@ -3,6 +3,8 @@
 namespace nova\plugin\workerman;
 
 
+use adapter\Adapter;
+use adapter\WorkermanApp;
 use Workerman\Connection\TcpConnection;
 use Workerman\Protocols\Http\Request;
 use Workerman\Worker;
@@ -36,7 +38,7 @@ $http_worker->onMessage = function (TcpConnection $connection,Request $request) 
     try {
         Adapter::InitServerVar($request);
         global $workermanApp;
-        $workermanApp = new WorkermanApp($request);
+        $workermanApp = new WorkermanApp($request,$connection);
         $response = $workermanApp->run();
         $connection->send($response);
     } catch (\Throwable $e) {

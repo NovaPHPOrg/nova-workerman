@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
-namespace nova\plugin\workerman;
+namespace adapter;
 
 use nova\framework\App;
 use nova\framework\core\Context;
 use nova\framework\core\Loader;
+use RuntimeException;
+use Workerman\Connection\TcpConnection;
 use Workerman\Protocols\Http\Request;
 use Workerman\Protocols\Http\Response;
-use RuntimeException;
+use Workerman\Protocols\Http\ServerSentEvents;
 use Workerman\Protocols\Http\Session;
 
 /**
@@ -23,6 +25,8 @@ class WorkermanApp
 
     /** @var Request HTTP 请求对象 */
     protected Request $request;
+
+    protected TcpConnection $connection;
 
     /**
      * 获取 WorkermanApp 实例
@@ -43,10 +47,11 @@ class WorkermanApp
      * 初始化应用程序环境，包括错误报告、自动加载器和上下文环境
      * @param Request $request HTTP 请求对象
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request,TcpConnection $connection)
     {
         $this->request = $request;
 
+        $this->connection = $connection;
         /**
          * 设置错误报告
          * 开发环境下显示所有错误
@@ -62,7 +67,7 @@ class WorkermanApp
          * 4. 启动应用程序
          */
 
-        $dir = dirname(__DIR__, 3);
+        $dir = dirname(__DIR__, 4);
 // 加载框架核心的自动加载器
         require_once "$dir/nova/framework/core/Loader.php";
         $loader = new Loader();
@@ -70,6 +75,7 @@ class WorkermanApp
 // 初始化应用程序上下文
         $context = new Context($loader);
 
+        $context->setResponseClass(WorkermanResponse::class);
 // 加载助手函数
         require_once "$dir/nova/framework/helper.php";
 //创建响应
@@ -95,7 +101,7 @@ class WorkermanApp
     {
         ob_start();
         App::getInstance()->start();
-        return $this->response->withBody(ob_get_clean());
+        return $this->response->withBody(ob_get_clean()?:"");
     }
 
     /**
@@ -159,6 +165,12 @@ class WorkermanApp
         return $this->request;
     }
 
+
+    public function connection():TcpConnection
+    {
+        return $this->connection;
+    }
+
     /**
      * 获取会话对象
      * @return Session|null 返回会话对象，如果创建失败则返回 null
@@ -170,5 +182,18 @@ class WorkermanApp
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function sendResponse(): void
+    {
+        $this->connection->send($this->response);
+    }
+
+    public function sendSSE(array $data): void
+    {
+        if (connection_aborted()) {
+            return;
+        }
+        $this->connection->send(new ServerSentEvents($data));
     }
 }

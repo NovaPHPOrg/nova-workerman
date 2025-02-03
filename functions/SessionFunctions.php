@@ -3,7 +3,7 @@
  * Session 相关功能重写
  */
 
-use nova\plugin\workerman\WorkermanApp;
+use adapter\WorkermanApp;
 use Random\RandomException;
 use Workerman\Protocols\Http\Request;
 use Workerman\Protocols\Http\Session;

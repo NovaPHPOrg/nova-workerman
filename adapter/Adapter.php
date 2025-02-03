@@ -1,5 +1,5 @@
 <?php
-namespace nova\plugin\workerman;
+namespace adapter;
 use Workerman\Protocols\Http\Request;
 
 class Adapter
@@ -7,10 +7,10 @@ class Adapter
 
     static function loadFunctions(): void
     {
-        require_once __DIR__ . "/functions/CommonFunctions.php";
-        require_once __DIR__ . "/functions/SessionFunctions.php";
-        require_once __DIR__ . "/functions/CookieFunctions.php";
-        require_once __DIR__ . "/functions/HttpFunctions.php";
+        require_once __DIR__ . "/../functions/CommonFunctions.php";
+        require_once __DIR__ . "/../functions/SessionFunctions.php";
+        require_once __DIR__ . "/../functions/CookieFunctions.php";
+        require_once __DIR__ . "/../functions/HttpFunctions.php";
 
     }
 
