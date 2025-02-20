@@ -41,7 +41,7 @@ $http_worker->onMessage = function (TcpConnection $connection,Request $request) 
         $workermanApp = new WorkermanApp($request,$connection);
         $response = $workermanApp->run();
         $connection->send($response);
-    } catch (\Throwable $e) {
+    } catch (\Throwable|\Error $e) {
         // 错误处理
         $connection->send("Internal Server Error: " . $e->getMessage());
     } finally {
