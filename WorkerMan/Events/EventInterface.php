@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -16,9 +17,9 @@ interface EventInterface
     /**
      * Delay the execution of a callback.
      *
-     * @param float $delay
-     * @param callable(mixed...): void $func
-     * @param array $args
+     * @param  float                    $delay
+     * @param  callable(mixed...): void $func
+     * @param  array                    $args
      * @return int
      */
     public function delay(float $delay, callable $func, array $args = []): int;
@@ -26,7 +27,7 @@ interface EventInterface
     /**
      * Delete a delay timer.
      *
-     * @param int $timerId
+     * @param  int  $timerId
      * @return bool
      */
     public function offDelay(int $timerId): bool;
@@ -34,9 +35,9 @@ interface EventInterface
     /**
      * Repeatedly execute a callback.
      *
-     * @param float $interval
-     * @param callable(mixed...): void $func
-     * @param array $args
+     * @param  float                    $interval
+     * @param  callable(mixed...): void $func
+     * @param  array                    $args
      * @return int
      */
     public function repeat(float $interval, callable $func, array $args = []): int;
@@ -44,7 +45,7 @@ interface EventInterface
     /**
      * Delete a repeat timer.
      *
-     * @param int $timerId
+     * @param  int  $timerId
      * @return bool
      */
     public function offRepeat(int $timerId): bool;
@@ -52,8 +53,8 @@ interface EventInterface
     /**
      * Execute a callback when a stream resource becomes readable or is closed for reading.
      *
-     * @param resource $stream
-     * @param callable(resource): void $func
+     * @param  resource                 $stream
+     * @param  callable(resource): void $func
      * @return void
      */
     public function onReadable($stream, callable $func): void;
@@ -61,7 +62,7 @@ interface EventInterface
     /**
      * Cancel a callback of stream readable.
      *
-     * @param resource $stream
+     * @param  resource $stream
      * @return bool
      */
     public function offReadable($stream): bool;
@@ -69,8 +70,8 @@ interface EventInterface
     /**
      * Execute a callback when a stream resource becomes writable or is closed for writing.
      *
-     * @param resource $stream
-     * @param callable(resource): void $func
+     * @param  resource                 $stream
+     * @param  callable(resource): void $func
      * @return void
      */
     public function onWritable($stream, callable $func): void;
@@ -78,7 +79,7 @@ interface EventInterface
     /**
      * Cancel a callback of stream writable.
      *
-     * @param resource $stream
+     * @param  resource $stream
      * @return bool
      */
     public function offWritable($stream): bool;
@@ -86,8 +87,8 @@ interface EventInterface
     /**
      * Execute a callback when a signal is received.
      *
-     * @param int $signal
-     * @param callable(int): void $func
+     * @param  int                 $signal
+     * @param  callable(int): void $func
      * @return void
      */
     public function onSignal(int $signal, callable $func): void;
@@ -95,7 +96,7 @@ interface EventInterface
     /**
      * Cancel a callback of signal.
      *
-     * @param int $signal
+     * @param  int  $signal
      * @return bool
      */
     public function offSignal(int $signal): bool;
@@ -131,7 +132,7 @@ interface EventInterface
     /**
      * Set error handler.
      *
-     * @param callable(\Throwable): void $errorHandler
+     * @param  callable(\Throwable): void $errorHandler
      * @return void
      */
     public function setErrorHandler(callable $errorHandler): void;

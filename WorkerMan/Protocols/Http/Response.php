@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,11 +12,14 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols\Http;
 
-use Stringable;
-
 use function array_merge_recursive;
+
 use function explode;
 use function file;
+
+use const FILE_IGNORE_NEW_LINES;
+use const FILE_SKIP_EMPTY_LINES;
+
 use function filemtime;
 use function gmdate;
 use function is_array;
@@ -23,10 +27,11 @@ use function is_file;
 use function pathinfo;
 use function preg_match;
 use function rawurlencode;
+
+use Stringable;
+
 use function strlen;
 use function substr;
-use const FILE_IGNORE_NEW_LINES;
-use const FILE_SKIP_EMPTY_LINES;
 
 /**
  * Class Response
@@ -34,7 +39,6 @@ use const FILE_SKIP_EMPTY_LINES;
  */
 class Response implements Stringable
 {
-
     /**
      * Http reason.
      *
@@ -160,13 +164,14 @@ class Response implements Stringable
         protected int    $status = 200,
         protected array  $headers = [],
         protected string $body = ''
-    ) {}
+    ) {
+    }
 
     /**
      * Set header.
      *
-     * @param string $name
-     * @param string $value
+     * @param  string $name
+     * @param  string $value
      * @return $this
      */
     public function header(string $name, string $value): static
@@ -178,8 +183,8 @@ class Response implements Stringable
     /**
      * Set header.
      *
-     * @param string $name
-     * @param string $value
+     * @param  string $name
+     * @param  string $value
      * @return $this
      */
     public function withHeader(string $name, string $value): static
@@ -190,7 +195,7 @@ class Response implements Stringable
     /**
      * Set headers.
      *
-     * @param array $headers
+     * @param  array $headers
      * @return $this
      */
     public function withHeaders(array $headers): static
@@ -202,7 +207,7 @@ class Response implements Stringable
     /**
      * Remove header.
      *
-     * @param string $name
+     * @param  string $name
      * @return $this
      */
     public function withoutHeader(string $name): static
@@ -214,7 +219,7 @@ class Response implements Stringable
     /**
      * Get header.
      *
-     * @param string $name
+     * @param  string            $name
      * @return null|array|string
      */
     public function getHeader(string $name): array|string|null
@@ -235,8 +240,8 @@ class Response implements Stringable
     /**
      * Set status.
      *
-     * @param int $code
-     * @param string|null $reasonPhrase
+     * @param  int         $code
+     * @param  string|null $reasonPhrase
      * @return $this
      */
     public function withStatus(int $code, ?string $reasonPhrase = null): static
@@ -269,7 +274,7 @@ class Response implements Stringable
     /**
      * Set protocol version.
      *
-     * @param string $version
+     * @param  string $version
      * @return $this
      */
     public function withProtocolVersion(string $version): static
@@ -281,7 +286,7 @@ class Response implements Stringable
     /**
      * Set http body.
      *
-     * @param string $body
+     * @param  string $body
      * @return $this
      */
     public function withBody(string $body): static
@@ -303,9 +308,9 @@ class Response implements Stringable
     /**
      * Send file.
      *
-     * @param string $file
-     * @param int $offset
-     * @param int $length
+     * @param  string $file
+     * @param  int    $offset
+     * @param  int    $length
      * @return $this
      */
     public function withFile(string $file, int $offset = 0, int $length = 0): static
@@ -320,14 +325,14 @@ class Response implements Stringable
     /**
      * Set cookie.
      *
-     * @param string $name
-     * @param string $value
-     * @param int|null $maxAge
-     * @param string $path
-     * @param string $domain
-     * @param bool $secure
-     * @param bool $httpOnly
-     * @param string $sameSite
+     * @param  string   $name
+     * @param  string   $value
+     * @param  int|null $maxAge
+     * @param  string   $path
+     * @param  string   $domain
+     * @param  bool     $secure
+     * @param  bool     $httpOnly
+     * @param  string   $sameSite
      * @return $this
      */
     public function cookie(string $name, string $value = '', ?int $maxAge = null, string $path = '', string $domain = '', bool $secure = false, bool $httpOnly = false, string $sameSite = ''): static
@@ -345,7 +350,7 @@ class Response implements Stringable
     /**
      * Create header for file.
      *
-     * @param array $fileInfo
+     * @param  array  $fileInfo
      * @return string
      */
     protected function createHeadForFile(array $fileInfo): string
@@ -431,7 +436,7 @@ class Response implements Stringable
 
         if (!isset($headers['Content-Type'])) {
             $head .= "Content-Type: text/html;charset=utf-8\r\n";
-        } else if ($headers['Content-Type'] === 'text/event-stream') {
+        } elseif ($headers['Content-Type'] === 'text/event-stream') {
             return $head . $this->body;
         }
 

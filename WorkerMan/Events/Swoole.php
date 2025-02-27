@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -148,7 +149,7 @@ final class Swoole implements EventInterface
         } elseif (isset($this->readEvents[$fd])) {
             Event::set($stream, null, fn () => $this->callWrite($fd), SWOOLE_EVENT_WRITE | SWOOLE_EVENT_READ);
         } else {
-            Event::set($stream, null, fn () =>$this->callWrite($fd), SWOOLE_EVENT_WRITE);
+            Event::set($stream, null, fn () => $this->callWrite($fd), SWOOLE_EVENT_WRITE);
         }
 
         $this->writeEvents[$fd] = [$func, [$stream]];
@@ -205,7 +206,7 @@ final class Swoole implements EventInterface
     public function run(): void
     {
         // Avoid process exit due to no listening
-        Timer::tick(100000000, static fn() => null);
+        Timer::tick(100000000, static fn () => null);
         Event::wait();
     }
 
@@ -244,7 +245,7 @@ final class Swoole implements EventInterface
     }
 
     /**
-     * @param $fd
+     * @param       $fd
      * @return void
      */
     private function callRead($fd)
@@ -255,7 +256,7 @@ final class Swoole implements EventInterface
     }
 
     /**
-     * @param $fd
+     * @param       $fd
      * @return void
      */
     private function callWrite($fd)
@@ -266,8 +267,8 @@ final class Swoole implements EventInterface
     }
 
     /**
-     * @param callable $func
-     * @param array $args
+     * @param  callable $func
+     * @param  array    $args
      * @return void
      */
     private function safeCall(callable $func, array $args = []): void

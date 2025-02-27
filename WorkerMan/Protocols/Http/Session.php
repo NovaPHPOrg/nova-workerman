@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,20 +12,21 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols\Http;
 
-use Exception;
-use Random\RandomException;
-use RuntimeException;
-use Workerman\Protocols\Http\Session\FileSessionHandler;
-use Workerman\Protocols\Http\Session\SessionHandlerInterface;
 use function array_key_exists;
 use function ini_get;
 use function is_array;
+
 use function is_scalar;
-use function preg_match;
+
+use Random\RandomException;
+
 use function random_int;
 use function serialize;
 use function session_get_cookie_params;
 use function unserialize;
+
+use Workerman\Protocols\Http\Session\FileSessionHandler;
+use Workerman\Protocols\Http\Session\SessionHandlerInterface;
 
 /**
  * Class Session
@@ -180,8 +182,8 @@ class Session
     /**
      * Get session.
      *
-     * @param string $name
-     * @param mixed $default
+     * @param  string $name
+     * @param  mixed  $default
      * @return mixed
      */
     public function get(string $name, mixed $default = null): mixed
@@ -193,7 +195,7 @@ class Session
      * Store data in the session.
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function set(string $name, mixed $value): void
     {
@@ -215,8 +217,8 @@ class Session
     /**
      * Retrieve and delete an item from the session.
      *
-     * @param string $name
-     * @param mixed $default
+     * @param  string $name
+     * @param  mixed  $default
      * @return mixed
      */
     public function pull(string $name, mixed $default = null): mixed
@@ -230,7 +232,7 @@ class Session
      * Store data in the session.
      *
      * @param array|string $key
-     * @param mixed $value
+     * @param mixed        $value
      */
     public function put(array|string $key, mixed $value = null): void
     {
@@ -286,7 +288,7 @@ class Session
     /**
      * Determining If An Item Exists In The Session.
      *
-     * @param string $name
+     * @param  string $name
      * @return bool
      */
     public function has(string $name): bool
@@ -297,7 +299,7 @@ class Session
     /**
      * To determine if an item is present in the session, even if its value is null.
      *
-     * @param string $name
+     * @param  string $name
      * @return bool
      */
     public function exists(string $name): bool
@@ -360,8 +362,8 @@ class Session
     /**
      * Set session handler class.
      *
-     * @param mixed $className
-     * @param mixed $config
+     * @param  mixed  $className
+     * @param  mixed  $config
      * @return string
      */
     public static function handlerClass(mixed $className = null, mixed $config = null): string

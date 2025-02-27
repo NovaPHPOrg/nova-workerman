@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -8,7 +11,6 @@
  */
 
 namespace nova\plugin\workerman;
-
 
 use adapter\Adapter;
 use adapter\WorkermanApp;
@@ -27,25 +29,23 @@ $http_worker->name = 'Nova WorkerMan';
 $cpuCount = cpu_count();
 $http_worker->count = $cpuCount * 2;  // 一般建议设置为CPU核心数的1-2倍
 
-
 $http_worker->onWorkerStart = function ($worker) use ($config) {
     $pid = getmypid();
     echo "Worker started at {$config['ip']}:{$config['port']},pid:{$pid}\n";
 };
 
-
 // Emitted when data received
-$http_worker->onMessage = function (TcpConnection $connection,Request $request) {
+$http_worker->onMessage = function (TcpConnection $connection, Request $request) {
     static $count;
     if ($count === null) {
         $count = 0;
     }
     $count++;
-    
+
     try {
         Adapter::InitServerVar($request);
         global $workermanApp;
-        $workermanApp = new WorkermanApp($request,$connection);
+        $workermanApp = new WorkermanApp($request, $connection);
         $response = $workermanApp->run();
         $connection->send($response);
     } catch (\Throwable|\Error $e) {
@@ -54,7 +54,6 @@ $http_worker->onMessage = function (TcpConnection $connection,Request $request) 
     } finally {
         $workermanApp = null;
     }
-
 
     // 优化内存管理策略
     if ($count % 1000 === 0) {  // 调整为更合理的频率

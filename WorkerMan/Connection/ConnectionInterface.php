@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,11 +12,10 @@ declare(strict_types=1);
 
 namespace Workerman\Connection;
 
+use AllowDynamicProperties;
 use Throwable;
-use Workerman\Events\Event;
 use Workerman\Events\EventInterface;
 use Workerman\Worker;
-use AllowDynamicProperties;
 
 /**
  * ConnectionInterface.
@@ -91,8 +91,8 @@ abstract class ConnectionInterface
     /**
      * Sends data on the connection.
      *
-     * @param mixed $sendBuffer
-     * @param bool $raw
+     * @param  mixed     $sendBuffer
+     * @param  bool      $raw
      * @return bool|null
      */
     abstract public function send(mixed $sendBuffer, bool $raw = false): bool|null;
@@ -142,8 +142,8 @@ abstract class ConnectionInterface
     /**
      * Close connection.
      *
-     * @param mixed $data
-     * @param bool $raw
+     * @param  mixed $data
+     * @param  bool  $raw
      * @return void
      */
     abstract public function close(mixed $data = null, bool $raw = false): void;
@@ -163,7 +163,7 @@ abstract class ConnectionInterface
     abstract public function isIpV6(): bool;
 
     /**
-     * @param Throwable $exception
+     * @param  Throwable $exception
      * @return void
      */
     public function error(Throwable $exception): void

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -12,7 +13,7 @@ declare(strict_types=1);
 namespace Workerman\Connection;
 
 use JsonSerializable;
-use Workerman\Protocols\ProtocolInterface;
+
 use function stream_socket_get_name;
 use function stream_socket_sendto;
 use function strlen;
@@ -44,17 +45,19 @@ class UdpConnection extends ConnectionInterface implements JsonSerializable
      * Construct.
      *
      * @param resource $socket
-     * @param string $remoteAddress
+     * @param string   $remoteAddress
      */
     public function __construct(
         protected $socket,
-        protected string $remoteAddress) {}
+        protected string $remoteAddress
+    ) {
+    }
 
     /**
      * Sends data on the connection.
      *
-     * @param mixed $sendBuffer
-     * @param bool $raw
+     * @param  mixed     $sendBuffer
+     * @param  bool      $raw
      * @return bool|null
      */
     public function send(mixed $sendBuffer, bool $raw = false): bool|null
@@ -145,12 +148,11 @@ class UdpConnection extends ConnectionInterface implements JsonSerializable
         return (string)@stream_socket_get_name($this->socket, false);
     }
 
-
     /**
      * Close connection.
      *
-     * @param mixed $data
-     * @param bool $raw
+     * @param  mixed $data
+     * @param  bool  $raw
      * @return void
      */
     public function close(mixed $data = null, bool $raw = false): void

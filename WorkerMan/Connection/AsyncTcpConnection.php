@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,34 +12,49 @@ declare(strict_types=1);
 
 namespace Workerman\Connection;
 
-use Exception;
-use RuntimeException;
-use stdClass;
-use Throwable;
-use Workerman\Timer;
-use Workerman\Worker;
 use function class_exists;
+
+use const DIRECTORY_SEPARATOR;
+
 use function explode;
 use function function_exists;
 use function is_resource;
+
 use function method_exists;
 use function microtime;
 use function parse_url;
+
+use const PHP_INT_MAX;
+
+use RuntimeException;
+
+use const SO_KEEPALIVE;
+
 use function socket_import_stream;
 use function socket_set_option;
+
+use const SOL_SOCKET;
+use const SOL_TCP;
+
+use stdClass;
+
+use const STREAM_CLIENT_ASYNC_CONNECT;
+
 use function stream_context_create;
 use function stream_set_blocking;
 use function stream_set_read_buffer;
+
 use function stream_socket_client;
 use function stream_socket_get_name;
-use function ucfirst;
-use const DIRECTORY_SEPARATOR;
-use const PHP_INT_MAX;
-use const SO_KEEPALIVE;
-use const SOL_SOCKET;
-use const SOL_TCP;
-use const STREAM_CLIENT_ASYNC_CONNECT;
+
 use const TCP_NODELAY;
+
+use Throwable;
+
+use function ucfirst;
+
+use Workerman\Timer;
+use Workerman\Worker;
 
 /**
  * AsyncTcpConnection.
@@ -148,7 +164,7 @@ class AsyncTcpConnection extends TcpConnection
      * Construct.
      *
      * @param string $remoteAddress
-     * @param array $socketContext
+     * @param array  $socketContext
      */
     public function __construct(string $remoteAddress, array $socketContext = [])
     {
@@ -202,13 +218,13 @@ class AsyncTcpConnection extends TcpConnection
         $this->maxPackageSize = self::$defaultMaxPackageSize;
         $this->socketContext = $socketContext;
         static::$connections[$this->realId] = $this;
-        $this->context = new stdClass;
+        $this->context = new stdClass();
     }
 
     /**
      * Reconnect.
      *
-     * @param int $after
+     * @param  int  $after
      * @return void
      */
     public function reconnect(int $after = 0): void
@@ -243,7 +259,7 @@ class AsyncTcpConnection extends TcpConnection
 
         $this->status = self::STATUS_CONNECTING;
         $this->connectStartTime = microtime(true);
-        set_error_handler(fn() => false);
+        set_error_handler(fn () => false);
         if ($this->transport !== 'unix') {
             if (!$this->remotePort) {
                 $this->remotePort = $this->transport === 'ssl' ? 443 : 80;
@@ -254,21 +270,37 @@ class AsyncTcpConnection extends TcpConnection
                 $this->socketContext['ssl']['peer_name'] = $this->remoteHost;
                 $context = stream_context_create($this->socketContext);
                 $this->socket = stream_socket_client("tcp://$this->proxySocks5", $errno, $err_str, 0, STREAM_CLIENT_ASYNC_CONNECT, $context);
-            } else if ($this->proxyHttp) {
+            } elseif ($this->proxyHttp) {
                 $this->socketContext['ssl']['peer_name'] = $this->remoteHost;
                 $context = stream_context_create($this->socketContext);
                 $this->socket = stream_socket_client("tcp://$this->proxyHttp", $errno, $err_str, 0, STREAM_CLIENT_ASYNC_CONNECT, $context);
-            } else if ($this->socketContext) {
+            } elseif ($this->socketContext) {
                 $context = stream_context_create($this->socketContext);
-                $this->socket = stream_socket_client("tcp://$this->remoteHost:$this->remotePort",
-                    $errno, $err_str, 0, STREAM_CLIENT_ASYNC_CONNECT, $context);
+                $this->socket = stream_socket_client(
+                    "tcp://$this->remoteHost:$this->remotePort",
+                    $errno,
+                    $err_str,
+                    0,
+                    STREAM_CLIENT_ASYNC_CONNECT,
+                    $context
+                );
             } else {
-                $this->socket = stream_socket_client("tcp://$this->remoteHost:$this->remotePort",
-                    $errno, $err_str, 0, STREAM_CLIENT_ASYNC_CONNECT);
+                $this->socket = stream_socket_client(
+                    "tcp://$this->remoteHost:$this->remotePort",
+                    $errno,
+                    $err_str,
+                    0,
+                    STREAM_CLIENT_ASYNC_CONNECT
+                );
             }
         } else {
-            $this->socket = stream_socket_client("$this->transport://$this->remoteAddress", $errno, $err_str, 0,
-                STREAM_CLIENT_ASYNC_CONNECT);
+            $this->socket = stream_socket_client(
+                "$this->transport://$this->remoteAddress",
+                $errno,
+                $err_str,
+                0,
+                STREAM_CLIENT_ASYNC_CONNECT
+            );
         }
         restore_error_handler();
         // If failed attempt to emit onError callback.
@@ -293,8 +325,8 @@ class AsyncTcpConnection extends TcpConnection
     /**
      * Try to emit onError callback.
      *
-     * @param int $code
-     * @param mixed $msg
+     * @param  int   $code
+     * @param  mixed $msg
      * @return void
      */
     protected function emitError(int $code, mixed $msg): void

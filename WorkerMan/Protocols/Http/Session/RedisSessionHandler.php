@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -37,15 +38,15 @@ class RedisSessionHandler implements SessionHandlerInterface
 
     /**
      * RedisSessionHandler constructor.
-     * @param array $config = [
-     *  'host'     => '127.0.0.1',
-     *  'port'     => 6379,
-     *  'timeout'  => 2,
-     *  'auth'     => '******',
-     *  'database' => 2,
-     *  'prefix'   => 'redis_session_',
-     *  'ping'     => 55,
-     * ]
+     * @param  array          $config = [
+     *                                'host'     => '127.0.0.1',
+     *                                'port'     => 6379,
+     *                                'timeout'  => 2,
+     *                                'auth'     => '******',
+     *                                'database' => 2,
+     *                                'prefix'   => 'redis_session_',
+     *                                'ping'     => 55,
+     *                                ]
      * @throws RedisException
      */
     public function __construct(array $config)
@@ -96,7 +97,7 @@ class RedisSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     * @param string $sessionId
+     * @param  string         $sessionId
      * @return string|false
      * @throws RedisException
      * @throws Throwable

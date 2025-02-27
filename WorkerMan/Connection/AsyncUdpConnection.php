@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,14 +12,17 @@ declare(strict_types=1);
 
 namespace Workerman\Connection;
 
-use Exception;
-use RuntimeException;
-use Throwable;
-use Workerman\Protocols\ProtocolInterface;
-use Workerman\Worker;
 use function class_exists;
+
+use Exception;
+
 use function explode;
 use function fclose;
+
+use RuntimeException;
+
+use const STREAM_CLIENT_CONNECT;
+
 use function stream_context_create;
 use function stream_set_blocking;
 use function stream_socket_client;
@@ -26,8 +30,12 @@ use function stream_socket_recvfrom;
 use function stream_socket_sendto;
 use function strlen;
 use function substr;
+
+use Throwable;
+
 use function ucfirst;
-use const STREAM_CLIENT_CONNECT;
+
+use Workerman\Worker;
 
 /**
  * AsyncUdpConnection.
@@ -65,7 +73,7 @@ class AsyncUdpConnection extends UdpConnection
     /**
      * Construct.
      *
-     * @param string $remoteAddress
+     * @param  string    $remoteAddress
      * @throws Throwable
      */
     public function __construct($remoteAddress, $contextOption = [])
@@ -91,7 +99,7 @@ class AsyncUdpConnection extends UdpConnection
     /**
      * For udp package.
      *
-     * @param resource $socket
+     * @param  resource $socket
      * @return void
      */
     public function baseRead($socket): void
@@ -117,8 +125,8 @@ class AsyncUdpConnection extends UdpConnection
     /**
      * Close connection.
      *
-     * @param mixed $data
-     * @param bool $raw
+     * @param  mixed $data
+     * @param  bool  $raw
      * @return void
      */
     public function close(mixed $data = null, bool $raw = false): void
@@ -143,8 +151,8 @@ class AsyncUdpConnection extends UdpConnection
     /**
      * Sends data on the connection.
      *
-     * @param mixed $sendBuffer
-     * @param bool $raw
+     * @param  mixed     $sendBuffer
+     * @param  bool      $raw
      * @return bool|null
      */
     public function send(mixed $sendBuffer, bool $raw = false): bool|null
@@ -176,8 +184,14 @@ class AsyncUdpConnection extends UdpConnection
         }
         if ($this->contextOption) {
             $context = stream_context_create($this->contextOption);
-            $this->socket = stream_socket_client("udp://$this->remoteAddress", $errno, $errmsg,
-                30, STREAM_CLIENT_CONNECT, $context);
+            $this->socket = stream_socket_client(
+                "udp://$this->remoteAddress",
+                $errno,
+                $errmsg,
+                30,
+                STREAM_CLIENT_CONNECT,
+                $context
+            );
         } else {
             $this->socket = stream_socket_client("udp://$this->remoteAddress", $errno, $errmsg);
         }

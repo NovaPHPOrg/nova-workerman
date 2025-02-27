@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -268,8 +269,8 @@ final class Event implements EventInterface
     }
 
     /**
-     * @param callable $func
-     * @param array $args
+     * @param  callable $func
+     * @param  array    $args
      * @return void
      */
     private function safeCall(callable $func, array $args = []): void

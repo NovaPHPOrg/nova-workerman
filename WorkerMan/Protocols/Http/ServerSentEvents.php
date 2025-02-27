@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,9 +12,9 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols\Http;
 
-use Stringable;
-
 use function str_replace;
+
+use Stringable;
 
 /**
  * Class ServerSentEvents
@@ -25,7 +26,9 @@ class ServerSentEvents implements Stringable
      * ServerSentEvents constructor.
      * $data for example ['event'=>'ping', 'data' => 'some thing', 'id' => 1000, 'retry' => 5000]
      */
-    public function __construct(protected array $data) {}
+    public function __construct(protected array $data)
+    {
+    }
 
     public function __toString(): string
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,26 +12,30 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols;
 
-use Throwable;
-use Workerman\Connection\AsyncTcpConnection;
-use Workerman\Connection\ConnectionInterface;
-use Workerman\Protocols\Http\Response;
-use Workerman\Timer;
-use Workerman\Worker;
 use function base64_encode;
 use function bin2hex;
 use function explode;
 use function floor;
 use function ord;
 use function pack;
+
 use function preg_match;
 use function sha1;
 use function str_repeat;
 use function strlen;
 use function strpos;
 use function substr;
+
+use Throwable;
+
 use function trim;
 use function unpack;
+
+use Workerman\Connection\AsyncTcpConnection;
+use Workerman\Connection\ConnectionInterface;
+use Workerman\Protocols\Http\Response;
+use Workerman\Timer;
+use Workerman\Worker;
 
 /**
  * Websocket protocol for client.
@@ -54,8 +59,8 @@ class Ws
     /**
      * Check the integrity of the package.
      *
-     * @param string $buffer
-     * @param AsyncTcpConnection $connection
+     * @param  string             $buffer
+     * @param  AsyncTcpConnection $connection
      * @return int
      */
     public static function input(string $buffer, AsyncTcpConnection $connection): int
@@ -106,7 +111,7 @@ class Ws
                     // Pong package.
                 case 0xa:
                     break;
-                // Close package.
+                    // Close package.
                 case 0x8:
                     // Try to emit onWebSocketClose callback.
                     if (isset($connection->onWebSocketClose)) {
@@ -120,8 +125,8 @@ class Ws
                         $connection->close();
                     }
                     return 0;
-                // Wrong opcode.
-                default :
+                    // Wrong opcode.
+                default:
                     Worker::safeEcho("error opcode $opcode and close websocket connection. Buffer:" . $buffer . "\n");
                     $connection->close();
                     return 0;
@@ -133,7 +138,7 @@ class Ws
                 }
                 $pack = unpack('nn/ntotal_len', $buffer);
                 $currentFrameLength = $pack['total_len'] + 4;
-            } else if ($dataLen === 127) {
+            } elseif ($dataLen === 127) {
                 if (strlen($buffer) < 10) {
                     return 0;
                 }
@@ -224,8 +229,8 @@ class Ws
     /**
      * Websocket encode.
      *
-     * @param string $payload
-     * @param AsyncTcpConnection $connection
+     * @param  string             $payload
+     * @param  AsyncTcpConnection $connection
      * @return string
      * @throws Throwable
      */
@@ -282,8 +287,8 @@ class Ws
     /**
      * Websocket decode.
      *
-     * @param string $bytes
-     * @param AsyncTcpConnection $connection
+     * @param  string             $bytes
+     * @param  AsyncTcpConnection $connection
      * @return string
      */
     public static function decode(string $bytes, AsyncTcpConnection $connection): string
@@ -292,7 +297,7 @@ class Ws
 
         if ($dataLength === 126) {
             $decodedData = substr($bytes, 4);
-        } else if ($dataLength === 127) {
+        } elseif ($dataLength === 127) {
             $decodedData = substr($bytes, 10);
         } else {
             $decodedData = substr($bytes, 2);
@@ -312,7 +317,7 @@ class Ws
     /**
      * Send websocket handshake data.
      *
-     * @param AsyncTcpConnection $connection
+     * @param  AsyncTcpConnection $connection
      * @return void
      * @throws Throwable
      */
@@ -341,7 +346,7 @@ class Ws
     /**
      * Send websocket handshake.
      *
-     * @param AsyncTcpConnection $connection
+     * @param  AsyncTcpConnection $connection
      * @return void
      * @throws Throwable
      */
@@ -381,8 +386,8 @@ class Ws
     /**
      * Websocket handshake.
      *
-     * @param string $buffer
-     * @param AsyncTcpConnection $connection
+     * @param  string             $buffer
+     * @param  AsyncTcpConnection $connection
      * @return bool|int
      */
     public static function dealHandshake(string $buffer, AsyncTcpConnection $connection): bool|int
@@ -440,7 +445,7 @@ class Ws
     /**
      * Parse response.
      *
-     * @param string $buffer
+     * @param  string   $buffer
      * @return Response
      */
     protected static function parseResponse(string $buffer): Response

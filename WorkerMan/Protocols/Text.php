@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,10 +12,12 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols;
 
-use Workerman\Connection\ConnectionInterface;
 use function rtrim;
+
 use function strlen;
 use function strpos;
+
+use Workerman\Connection\ConnectionInterface;
 
 /**
  * Text Protocol.
@@ -24,8 +27,8 @@ class Text
     /**
      * Check the integrity of the package.
      *
-     * @param string $buffer
-     * @param ConnectionInterface $connection
+     * @param  string              $buffer
+     * @param  ConnectionInterface $connection
      * @return int
      */
     public static function input(string $buffer, ConnectionInterface $connection): int
@@ -48,7 +51,7 @@ class Text
     /**
      * Encode.
      *
-     * @param string $buffer
+     * @param  string $buffer
      * @return string
      */
     public static function encode(string $buffer): string
@@ -60,7 +63,7 @@ class Text
     /**
      * Decode.
      *
-     * @param string $buffer
+     * @param  string $buffer
      * @return string
      */
     public static function decode(string $buffer): string

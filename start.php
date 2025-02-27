@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -14,7 +17,7 @@ spl_autoload_register(function ($class) {
     if (file_exists($file)) {
         require_once $file;
     }
-    $file = dirname(__DIR__,3) . "/$class.php";
+    $file = dirname(__DIR__, 3) . "/$class.php";
     if (file_exists($file)) {
         require_once $file;
     }
@@ -22,6 +25,6 @@ spl_autoload_register(function ($class) {
 
 $dir = dirname(__DIR__, 3);
 
-if(file_exists(  "$dir/vendor/autoload.php")){
+if (file_exists("$dir/vendor/autoload.php")) {
     require_once "$dir/vendor/autoload.php";
 }

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -9,13 +12,11 @@
 
 namespace adapter;
 
-use nova\framework\core\Logger;
 use nova\framework\http\Response;
 
 class WorkermanResponse extends Response
 {
-
-    function sendSSE(): void
+    public function sendSSE(): void
     {
         $callback = $this->data;
         $this->sendHeaders();
@@ -24,7 +25,9 @@ class WorkermanResponse extends Response
         }
         WorkermanApp::instance()->sendResponse();
         $callback(function ($data, $event = null) {
-            if ($data == null) return;
+            if ($data == null) {
+                return;
+            }
             WorkermanApp::instance()->sendSSE(['data' => $data, 'event' => $event ?? 'message']);
         });
         while (!connection_aborted()) {

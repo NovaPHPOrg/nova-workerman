@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,18 +12,14 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols;
 
-use Workerman\Connection\TcpConnection;
-use Workerman\Protocols\Http\Request;
-use Workerman\Protocols\Http\Response;
 use function clearstatcache;
 use function count;
-use function explode;
 use function filesize;
+
 use function fopen;
 use function fread;
 use function fseek;
 use function ftell;
-use function in_array;
 use function ini_get;
 use function is_array;
 use function is_object;
@@ -30,9 +27,12 @@ use function preg_match;
 use function str_starts_with;
 use function strlen;
 use function strpos;
-use function strstr;
 use function substr;
 use function sys_get_temp_dir;
+
+use Workerman\Connection\TcpConnection;
+use Workerman\Protocols\Http\Request;
+use Workerman\Protocols\Http\Response;
 
 /**
  * Class Http.
@@ -57,7 +57,7 @@ class Http
     /**
      * Get or set the request class name.
      *
-     * @param class-string|null $className
+     * @param  class-string|null $className
      * @return string
      */
     public static function requestClass(?string $className = null): string
@@ -71,8 +71,8 @@ class Http
     /**
      * Check the integrity of the package.
      *
-     * @param string $buffer
-     * @param TcpConnection $connection
+     * @param  string        $buffer
+     * @param  TcpConnection $connection
      * @return int
      */
     public static function input(string $buffer, TcpConnection $connection): int
@@ -118,12 +118,11 @@ class Http
         return $length;
     }
 
-
     /**
      * Http decode.
      *
-     * @param string $buffer
-     * @param TcpConnection $connection
+     * @param  string        $buffer
+     * @param  TcpConnection $connection
      * @return Request
      */
     public static function decode(string $buffer, TcpConnection $connection): Request
@@ -152,8 +151,8 @@ class Http
     /**
      * Http encode.
      *
-     * @param string|Response $response
-     * @param TcpConnection $connection
+     * @param  string|Response $response
+     * @param  TcpConnection   $connection
      * @return string
      */
     public static function encode(mixed $response, TcpConnection $connection): string
@@ -226,9 +225,9 @@ class Http
      * Send remainder of a stream to client.
      *
      * @param TcpConnection $connection
-     * @param resource $handler
-     * @param int $offset
-     * @param int $length
+     * @param resource      $handler
+     * @param int           $offset
+     * @param int           $length
      */
     protected static function sendStream(TcpConnection $connection, $handler, int $offset = 0, int $length = 0): void
     {
@@ -281,7 +280,7 @@ class Http
     /**
      * Set or get uploadTmpDir.
      *
-     * @param string|null $dir
+     * @param  string|null $dir
      * @return string
      */
     public static function uploadTmpDir(string|null $dir = null): string
@@ -292,7 +291,7 @@ class Http
         if (static::$uploadTmpDir === '') {
             if ($uploadTmpDir = ini_get('upload_tmp_dir')) {
                 static::$uploadTmpDir = $uploadTmpDir;
-            } else if ($uploadTmpDir = sys_get_temp_dir()) {
+            } elseif ($uploadTmpDir = sys_get_temp_dir()) {
                 static::$uploadTmpDir = $uploadTmpDir;
             }
         }

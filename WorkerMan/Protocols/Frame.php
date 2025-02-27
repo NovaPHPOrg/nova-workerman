@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -24,7 +25,7 @@ class Frame
     /**
      * Check the integrity of the package.
      *
-     * @param string $buffer
+     * @param  string $buffer
      * @return int
      */
     public static function input(string $buffer): int
@@ -39,7 +40,7 @@ class Frame
     /**
      * Decode.
      *
-     * @param string $buffer
+     * @param  string $buffer
      * @return string
      */
     public static function decode(string $buffer): string
@@ -50,7 +51,7 @@ class Frame
     /**
      * Encode.
      *
-     * @param string $data
+     * @param  string $data
      * @return string
      */
     public static function encode(string $data): string

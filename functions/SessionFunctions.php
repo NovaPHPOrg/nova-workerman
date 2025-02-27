@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -16,7 +19,6 @@ use Random\RandomException;
 use Workerman\Protocols\Http\Request;
 use Workerman\Protocols\Http\Session;
 use Workerman\Protocols\Http\Session\FileSessionHandler;
-
 
 if (!function_exists('session_commit')) {
     function session_commit(): void
@@ -36,7 +38,6 @@ if (!function_exists('session_create_id')) {
     }
 }
 
-
 if (!function_exists('session_destroy')) {
     function session_destroy(): void
     {
@@ -44,8 +45,6 @@ if (!function_exists('session_destroy')) {
         WorkermanApp::instance()->session()?->flush();
     }
 }
-
-
 
 if (!function_exists('session_gc')) {
     function session_gc(): void
@@ -70,7 +69,8 @@ if (!function_exists('session_get_cookie_params')) {
 }
 
 if (!function_exists('session_id')) {
-    function session_id($id = null){
+    function session_id($id = null)
+    {
         /* @var Request $req */
         try {
             WorkermanApp::instance()->request()->sessionId($id);
@@ -80,13 +80,13 @@ if (!function_exists('session_id')) {
     }
 }
 
-
 if (!function_exists('session_name')) {
-    function session_name($name = null){
+    function session_name($name = null)
+    {
         // — 读取/设置会话名称
         if ($name === null) {
             return ini_get('session.name');
-        }else{
+        } else {
             ini_set('session.name', $name);
         }
         return null;
@@ -104,10 +104,9 @@ if (!function_exists('session_regenerate_id')) {
     }
 }
 
-
-
 if (!function_exists('session_save_path')) {
-    function session_save_path(string $path = null): ?string{
+    function session_save_path(string $path = null): ?string
+    {
         if ($path === null) {
             return ini_get('session.save_path');
         }
@@ -118,25 +117,26 @@ if (!function_exists('session_save_path')) {
 }
 
 if (!function_exists('session_set_cookie_params')) {
-    function session_set_cookie_params($options): void{
+    function session_set_cookie_params($options): void
+    {
         // — 设置会话 cookie 参数
         if (isset($options['lifetime'])) {
-           Session::$lifetime = $options['lifetime'];
+            Session::$lifetime = $options['lifetime'];
         }
         if (isset($options['path'])) {
             Session::$cookiePath = $options['path'];
         }
         if (isset($options['domain'])) {
-           Session::$domain = $options['domain'];
+            Session::$domain = $options['domain'];
         }
         if (isset($options['secure'])) {
-           Session::$secure = $options['secure'];
+            Session::$secure = $options['secure'];
         }
         if (isset($options['httponly'])) {
-          Session::$httpOnly = $options['httponly'];
+            Session::$httpOnly = $options['httponly'];
         }
         if (isset($options['samesite'])) {
-           Session::$sameSite = $options['samesite'];
+            Session::$sameSite = $options['samesite'];
         }
     }
 }
@@ -149,13 +149,13 @@ if (!function_exists('session_set_save_handler')) {
         // 创建一个反射类实例，用于访问和操作 Session 类
         $reflector = new ReflectionClass('Workerman\Protocols\Http\Session');
 
-// 获取私有静态属性 $_handler 的 ReflectionProperty 对象
+        // 获取私有静态属性 $_handler 的 ReflectionProperty 对象
         $property = $reflector->getProperty('_handler');
 
-// 设置私有属性为可访问
+        // 设置私有属性为可访问
         $property->setAccessible(true);
 
-// 给 $_handler 属性赋值为 $sessionHandler
+        // 给 $_handler 属性赋值为 $sessionHandler
         $property->setValue(null, $sessionHandler); // null 表示这是一个静态属性
     }
 }
@@ -174,17 +174,18 @@ if (!function_exists('session_status')) {
         try {
             if (WorkermanApp::instance()->session() == null) {
                 return PHP_SESSION_NONE;
-            }else{
+            } else {
                 return PHP_SESSION_ACTIVE;
             }
-        }catch (Exception $e){
+        } catch (Exception $e) {
             return PHP_SESSION_NONE;
         }
     }
 }
 
 if (!function_exists('session_unset')) {
-    function session_unset(){
+    function session_unset()
+    {
         // — 释放所有的会话变量
         session_destroy();
     }

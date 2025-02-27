@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,18 +12,25 @@ declare(strict_types=1);
 
 namespace Workerman;
 
-use RuntimeException;
-use Throwable;
-use Workerman\Events\EventInterface;
-use Workerman\Events\Revolt;
-use Workerman\Events\Swoole;
-use Workerman\Events\Swow;
 use function function_exists;
 use function pcntl_alarm;
 use function pcntl_signal;
-use function time;
+
 use const PHP_INT_MAX;
+
+use RuntimeException;
+
 use const SIGALRM;
+
+use Throwable;
+
+use function time;
+
+use Workerman\Events\EventInterface;
+use Workerman\Events\Revolt;
+
+use Workerman\Events\Swoole;
+use Workerman\Events\Swow;
 
 /**
  * Timer.
@@ -70,7 +78,7 @@ class Timer
     /**
      * Init.
      *
-     * @param EventInterface|null $event
+     * @param  EventInterface|null $event
      * @return void
      */
     public static function init(?EventInterface $event = null): void
@@ -87,9 +95,9 @@ class Timer
     /**
      * Repeat.
      *
-     * @param float $timeInterval
-     * @param callable $func
-     * @param array $args
+     * @param  float    $timeInterval
+     * @param  callable $func
+     * @param  array    $args
      * @return int
      */
     public static function repeat(float $timeInterval, callable $func, array $args = []): int
@@ -100,9 +108,9 @@ class Timer
     /**
      * Delay.
      *
-     * @param float $timeInterval
-     * @param callable $func
-     * @param array $args
+     * @param  float    $timeInterval
+     * @param  callable $func
+     * @param  array    $args
      * @return int
      */
     public static function delay(float $timeInterval, callable $func, array $args = []): int
@@ -126,10 +134,10 @@ class Timer
     /**
      * Add a timer.
      *
-     * @param float $timeInterval
-     * @param callable $func
-     * @param null|array $args
-     * @param bool $persistent
+     * @param  float      $timeInterval
+     * @param  callable   $func
+     * @param  null|array $args
+     * @param  bool       $persistent
      * @return int
      */
     public static function add(float $timeInterval, callable $func, ?array $args = [], bool $persistent = true): int
@@ -170,7 +178,7 @@ class Timer
     /**
      * Coroutine sleep.
      *
-     * @param float $delay
+     * @param  float $delay
      * @return void
      */
     public static function sleep(float $delay): void
@@ -184,11 +192,11 @@ class Timer
                 }, null, false);
                 $suspension->suspend();
                 return;
-            // Swoole
+                // Swoole
             case Swoole::class:
                 \Swoole\Coroutine\System::sleep($delay);
                 return;
-            // Swow
+                // Swow
             case Swow::class:
                 usleep((int)($delay * 1000 * 1000));
                 return;
@@ -236,7 +244,7 @@ class Timer
     /**
      * Remove a timer.
      *
-     * @param int $timerId
+     * @param  int  $timerId
      * @return bool
      */
     public static function del(int $timerId): bool

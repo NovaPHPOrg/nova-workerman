@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -50,10 +53,9 @@ if (!function_exists('http_response_code')) {
     function http_response_code(int $response_code = 200): int
     {
         WorkermanApp::instance()->setResponseCode($response_code);
-         return $response_code;
+        return $response_code;
     }
 }
-
 
 if (! function_exists('getallheaders')) { // It's declared in a dev lib
     /**

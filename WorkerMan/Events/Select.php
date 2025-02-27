@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,14 +12,18 @@ declare(strict_types=1);
 
 namespace Workerman\Events;
 
-use SplPriorityQueue;
-use Throwable;
 use function count;
+
+use const DIRECTORY_SEPARATOR;
+
 use function max;
 use function microtime;
 use function pcntl_signal;
 use function pcntl_signal_dispatch;
-use const DIRECTORY_SEPARATOR;
+
+use SplPriorityQueue;
+
+use Throwable;
 
 /**
  * select eventloop
@@ -188,7 +193,7 @@ final class Select implements EventInterface
         $count = count($this->readFds);
         if ($count >= 1024) {
             trigger_error("System call select exceeded the maximum number of connections 1024, please install event extension for more connections.", E_USER_WARNING);
-        } else if (DIRECTORY_SEPARATOR !== '/' && $count >= 256) {
+        } elseif (DIRECTORY_SEPARATOR !== '/' && $count >= 256) {
             trigger_error("System call select exceeded the maximum number of connections 256.", E_USER_WARNING);
         }
         $fdKey = (int)$stream;
@@ -217,7 +222,7 @@ final class Select implements EventInterface
         $count = count($this->writeFds);
         if ($count >= 1024) {
             trigger_error("System call select exceeded the maximum number of connections 1024, please install event/libevent extension for more connections.", E_USER_WARNING);
-        } else if (DIRECTORY_SEPARATOR !== '/' && $count >= 256) {
+        } elseif (DIRECTORY_SEPARATOR !== '/' && $count >= 256) {
             trigger_error("System call select exceeded the maximum number of connections 256.", E_USER_WARNING);
         }
         $fdKey = (int)$stream;
@@ -254,7 +259,7 @@ final class Select implements EventInterface
     /**
      * Off except.
      *
-     * @param resource $stream
+     * @param  resource $stream
      * @return bool
      */
     public function offExcept($stream): bool
@@ -345,7 +350,7 @@ final class Select implements EventInterface
     /**
      * Set next tick time.
      *
-     * @param float $nextTickTime
+     * @param  float $nextTickTime
      * @return void
      */
     protected function setNextTickTime(float $nextTickTime): void
@@ -457,8 +462,8 @@ final class Select implements EventInterface
     }
 
     /**
-     * @param callable $func
-     * @param array $args
+     * @param  callable $func
+     * @param  array    $args
      * @return void
      */
     private function safeCall(callable $func, array $args = []): void

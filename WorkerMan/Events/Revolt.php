@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,11 +12,13 @@ declare(strict_types=1);
 
 namespace Workerman\Events;
 
-use Revolt\EventLoop;
-use Revolt\EventLoop\Driver;
 use function count;
 use function function_exists;
+
 use function pcntl_signal;
+
+use Revolt\EventLoop;
+use Revolt\EventLoop\Driver;
 
 /**
  * Revolt eventloop

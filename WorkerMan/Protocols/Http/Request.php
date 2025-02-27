@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,15 +12,13 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols\Http;
 
-use Exception;
-use RuntimeException;
-use Stringable;
-use Workerman\Connection\TcpConnection;
-use Workerman\Protocols\Http;
 use function array_walk_recursive;
 use function bin2hex;
 use function clearstatcache;
 use function count;
+
+use Exception;
+
 use function explode;
 use function file_put_contents;
 use function is_file;
@@ -31,6 +30,10 @@ use function parse_str;
 use function parse_url;
 use function preg_match;
 use function preg_replace;
+
+use RuntimeException;
+use Stringable;
+
 use function strlen;
 use function strpos;
 use function strstr;
@@ -40,6 +43,9 @@ use function tempnam;
 use function trim;
 use function unlink;
 use function urlencode;
+
+use Workerman\Connection\TcpConnection;
+use Workerman\Protocols\Http;
 
 /**
  * Class Request
@@ -105,13 +111,15 @@ class Request implements Stringable
      * Request constructor.
      *
      */
-    public function __construct(protected string $buffer) {}
+    public function __construct(protected string $buffer)
+    {
+    }
 
     /**
      * Get query.
      *
-     * @param string|null $name
-     * @param mixed $default
+     * @param  string|null $name
+     * @param  mixed       $default
      * @return mixed
      */
     public function get(?string $name = null, mixed $default = null): mixed
@@ -128,8 +136,8 @@ class Request implements Stringable
     /**
      * Get post.
      *
-     * @param string|null $name
-     * @param mixed $default
+     * @param  string|null $name
+     * @param  mixed       $default
      * @return mixed
      */
     public function post(?string $name = null, mixed $default = null): mixed
@@ -146,8 +154,8 @@ class Request implements Stringable
     /**
      * Get header item by name.
      *
-     * @param string|null $name
-     * @param mixed $default
+     * @param  string|null $name
+     * @param  mixed       $default
      * @return mixed
      */
     public function header(?string $name = null, mixed $default = null): mixed
@@ -165,8 +173,8 @@ class Request implements Stringable
     /**
      * Get cookie item by name.
      *
-     * @param string|null $name
-     * @param mixed $default
+     * @param  string|null $name
+     * @param  mixed       $default
      * @return mixed
      */
     public function cookie(?string $name = null, mixed $default = null): mixed
@@ -193,7 +201,7 @@ class Request implements Stringable
     /**
      * Get upload files.
      *
-     * @param string|null $name
+     * @param  string|null $name
      * @return array|null
      */
     public function file(?string $name = null): mixed
@@ -244,7 +252,7 @@ class Request implements Stringable
     /**
      * Get host.
      *
-     * @param bool $withoutPort
+     * @param  bool        $withoutPort
      * @return string|null
      */
     public function host(bool $withoutPort = false): ?string
@@ -303,7 +311,7 @@ class Request implements Stringable
     /**
      * Get/Set session id.
      *
-     * @param string|null $sessionId
+     * @param  string|null $sessionId
      * @return string
      * @throws Exception
      */
@@ -332,7 +340,7 @@ class Request implements Stringable
     /**
      * Check if session id is valid.
      *
-     * @param mixed $sessionId
+     * @param  mixed $sessionId
      * @return bool
      */
     public function isValidSessionId(mixed $sessionId): bool
@@ -343,7 +351,7 @@ class Request implements Stringable
     /**
      * Session regenerate id.
      *
-     * @param bool $deleteOldSession
+     * @param  bool      $deleteOldSession
      * @return string
      * @throws Exception
      */
@@ -529,7 +537,7 @@ class Request implements Stringable
     /**
      * Parse upload files.
      *
-     * @param string $httpPostBoundary
+     * @param  string $httpPostBoundary
      * @return void
      */
     protected function parseUploadFiles(string $httpPostBoundary): void
@@ -560,11 +568,11 @@ class Request implements Stringable
     /**
      * Parse upload file.
      *
-     * @param string $boundary
-     * @param int $sectionStartOffset
-     * @param string $postEncodeString
-     * @param string $filesEncodeStr
-     * @param array $files
+     * @param  string $boundary
+     * @param  int    $sectionStartOffset
+     * @param  string $postEncodeString
+     * @param  string $filesEncodeStr
+     * @param  array  $files
      * @return int
      */
     protected function parseUploadFile(string $boundary, int $sectionStartOffset, string &$postEncodeString, string &$filesEncodeStr, array &$files): int
@@ -603,7 +611,7 @@ class Request implements Stringable
                         $tmpUploadDir = HTTP::uploadTmpDir();
                         if (!$tmpUploadDir) {
                             $error = UPLOAD_ERR_NO_TMP_DIR;
-                        } else if ($boundaryValue === '' && $fileName === '') {
+                        } elseif ($boundaryValue === '' && $fileName === '') {
                             $error = UPLOAD_ERR_NO_FILE;
                         } else {
                             $tmpFile = tempnam($tmpUploadDir, 'workerman.upload.');
@@ -624,7 +632,7 @@ class Request implements Stringable
                         $postEncodeString .= urlencode($k) . "=" . urlencode($boundaryValue) . '&';
                     }
                     return $sectionEndOffset + strlen($boundary) + 2;
-                
+
                 case "content-type":
                     $file['type'] = trim($value);
                     break;
@@ -655,9 +663,9 @@ class Request implements Stringable
     }
 
     /**
-     * @param string $sessionName
-     * @param string $sid
-     * @param array $cookieParams
+     * @param  string $sessionName
+     * @param  string $sid
+     * @param  array  $cookieParams
      * @return void
      */
     protected function setSidCookie(string $sessionName, string $sid, array $cookieParams): void
@@ -685,8 +693,8 @@ class Request implements Stringable
     /**
      * Setter.
      *
-     * @param string $name
-     * @param mixed $value
+     * @param  string $name
+     * @param  mixed  $value
      * @return void
      */
     public function __set(string $name, mixed $value): void
@@ -697,7 +705,7 @@ class Request implements Stringable
     /**
      * Getter.
      *
-     * @param string $name
+     * @param  string $name
      * @return mixed
      */
     public function __get(string $name): mixed
@@ -708,7 +716,7 @@ class Request implements Stringable
     /**
      * Isset.
      *
-     * @param string $name
+     * @param  string $name
      * @return bool
      */
     public function __isset(string $name): bool
@@ -719,7 +727,7 @@ class Request implements Stringable
     /**
      * Unset.
      *
-     * @param string $name
+     * @param  string $name
      * @return void
      */
     public function __unset(string $name): void

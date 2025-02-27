@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -10,18 +11,6 @@ declare(strict_types=1);
 
 namespace Workerman\Connection;
 
-use JsonSerializable;
-use RuntimeException;
-use stdClass;
-use Throwable;
-use Workerman\Events\Ev;
-use Workerman\Events\Event;
-use Workerman\Events\EventInterface;
-use Workerman\Events\Select;
-use Workerman\Protocols\Http\Request;
-use Workerman\Protocols\ProtocolInterface;
-use Workerman\Worker;
-
 use function ceil;
 use function count;
 use function fclose;
@@ -31,11 +20,28 @@ use function function_exists;
 use function fwrite;
 use function is_object;
 use function is_resource;
+
+use JsonSerializable;
+
 use function key;
 use function method_exists;
+
+use const PHP_INT_MAX;
+
 use function posix_getpid;
 use function restore_error_handler;
+
+use RuntimeException;
+
 use function set_error_handler;
+
+use stdClass;
+
+use const STREAM_CRYPTO_METHOD_SSLv23_CLIENT;
+use const STREAM_CRYPTO_METHOD_SSLv23_SERVER;
+use const STREAM_CRYPTO_METHOD_SSLv2_CLIENT;
+use const STREAM_CRYPTO_METHOD_SSLv2_SERVER;
+
 use function stream_set_blocking;
 use function stream_set_read_buffer;
 use function stream_socket_enable_crypto;
@@ -44,13 +50,18 @@ use function strlen;
 use function strrchr;
 use function strrpos;
 use function substr;
+
+use Throwable;
+
 use function var_export;
 
-use const PHP_INT_MAX;
-use const STREAM_CRYPTO_METHOD_SSLv23_CLIENT;
-use const STREAM_CRYPTO_METHOD_SSLv23_SERVER;
-use const STREAM_CRYPTO_METHOD_SSLv2_CLIENT;
-use const STREAM_CRYPTO_METHOD_SSLv2_SERVER;
+use Workerman\Events\Ev;
+
+use Workerman\Events\Event;
+use Workerman\Events\EventInterface;
+use Workerman\Events\Select;
+use Workerman\Protocols\Http\Request;
+use Workerman\Worker;
 
 /**
  * TcpConnection.
@@ -340,7 +351,6 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
      */
     public static array $connections = [];
 
-
     /**
      * Reuse request.
      *
@@ -365,8 +375,8 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
      * Construct.
      *
      * @param EventInterface $eventLoop
-     * @param resource $socket
-     * @param string $remoteAddress
+     * @param resource       $socket
+     * @param string         $remoteAddress
      */
     public function __construct(EventInterface $eventLoop, $socket, string $remoteAddress = '')
     {
@@ -408,8 +418,8 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
     /**
      * Sends data on the connection.
      *
-     * @param mixed $sendBuffer
-     * @param bool $raw
+     * @param  mixed     $sendBuffer
+     * @param  bool      $raw
      * @return bool|null
      */
     public function send(mixed $sendBuffer, bool $raw = false): bool|null
@@ -422,7 +432,7 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
         if (false === $raw && $this->protocol !== null) {
             try {
                 $sendBuffer = $this->protocol::encode($sendBuffer, $this);
-            } catch(Throwable $e) {
+            } catch (Throwable $e) {
                 $this->error($e);
             }
             if ($sendBuffer === '') {
@@ -623,12 +633,11 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
         }
     }
 
-
     /**
      * Base read handler.
      *
-     * @param resource $socket
-     * @param bool $checkEof
+     * @param  resource $socket
+     * @param  bool     $checkEof
      * @return void
      */
     public function baseRead($socket, bool $checkEof = true): void
@@ -824,7 +833,7 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
     /**
      * SSL handshake.
      *
-     * @param resource $socket
+     * @param  resource $socket
      * @return bool|int
      */
     public function doSslHandshake($socket): bool|int
@@ -875,7 +884,7 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
     /**
      * This method pulls all the data out of a readable stream, and writes it to the supplied destination.
      *
-     * @param self $dest
+     * @param  self $dest
      * @return void
      */
     public function pipe(self $dest): void
@@ -898,7 +907,7 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
     /**
      * Remove $length of data from receive buffer.
      *
-     * @param int $length
+     * @param  int  $length
      * @return void
      */
     public function consumeRecvBuffer(int $length): void
@@ -909,8 +918,8 @@ class TcpConnection extends ConnectionInterface implements JsonSerializable
     /**
      * Close connection.
      *
-     * @param mixed $data
-     * @param bool $raw
+     * @param  mixed $data
+     * @param  bool  $raw
      * @return void
      */
     public function close(mixed $data = null, bool $raw = false): void

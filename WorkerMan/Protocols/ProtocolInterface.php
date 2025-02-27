@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -24,8 +25,8 @@ interface ProtocolInterface
      * If length is unknown please return 0 that means waiting for more data.
      * If the package has something wrong please return -1 the connection will be closed.
      *
-     * @param string $buffer
-     * @param ConnectionInterface $connection
+     * @param  string              $buffer
+     * @param  ConnectionInterface $connection
      * @return int
      */
     public static function input(string $buffer, ConnectionInterface $connection): int;
@@ -33,8 +34,8 @@ interface ProtocolInterface
     /**
      * Decode package and emit onMessage($message) callback, $message is the result that decode returned.
      *
-     * @param string $buffer
-     * @param ConnectionInterface $connection
+     * @param  string              $buffer
+     * @param  ConnectionInterface $connection
      * @return mixed
      */
     public static function decode(string $buffer, ConnectionInterface $connection): mixed;
@@ -42,8 +43,8 @@ interface ProtocolInterface
     /**
      * Encode package before sending to client.
      *
-     * @param mixed $data
-     * @param ConnectionInterface $connection
+     * @param  mixed               $data
+     * @param  ConnectionInterface $connection
      * @return string
      */
     public static function encode(mixed $data, ConnectionInterface $connection): string;

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,16 +12,12 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols;
 
-use Throwable;
-use Workerman\Connection\ConnectionInterface;
-use Workerman\Connection\TcpConnection;
-use Workerman\Protocols\Http\Request;
-use Workerman\Worker;
 use function base64_encode;
 use function chr;
 use function deflate_add;
 use function deflate_init;
 use function floor;
+
 use function inflate_add;
 use function inflate_init;
 use function is_scalar;
@@ -33,7 +30,16 @@ use function stripos;
 use function strlen;
 use function strpos;
 use function substr;
+
+use Throwable;
+
 use function unpack;
+
+use Workerman\Connection\ConnectionInterface;
+use Workerman\Connection\TcpConnection;
+use Workerman\Protocols\Http\Request;
+use Workerman\Worker;
+
 use const ZLIB_DEFAULT_STRATEGY;
 use const ZLIB_ENCODING_RAW;
 
@@ -54,7 +60,7 @@ class Websocket
      *
      * @var string
      */
-    const BINARY_TYPE_BLOB_DEFLATE = "\xc1";
+    public const BINARY_TYPE_BLOB_DEFLATE = "\xc1";
 
     /**
      * Websocket arraybuffer type.
@@ -68,13 +74,13 @@ class Websocket
      *
      * @var string
      */
-    const BINARY_TYPE_ARRAYBUFFER_DEFLATE = "\xc2";
+    public const BINARY_TYPE_ARRAYBUFFER_DEFLATE = "\xc2";
 
     /**
      * Check the integrity of the package.
      *
-     * @param string $buffer
-     * @param TcpConnection $connection
+     * @param  string        $buffer
+     * @param  TcpConnection $connection
      * @return int
      */
     public static function input(string $buffer, TcpConnection $connection): int
@@ -123,7 +129,7 @@ class Websocket
                     // Pong package.
                 case 0xa:
                     break;
-                // Close package.
+                    // Close package.
                 case 0x8:
                     // Try to emit onWebSocketClose callback.
                     $closeCb = $connection->onWebSocketClose ?? $connection->worker->onWebSocketClose ?? false;
@@ -138,8 +144,8 @@ class Websocket
                         $connection->close("\x88\x02\x03\xe8", true);
                     }
                     return 0;
-                // Wrong opcode.
-                default :
+                    // Wrong opcode.
+                default:
                     Worker::safeEcho("error opcode $opcode and close websocket connection. Buffer:" . bin2hex($buffer) . "\n");
                     $connection->close();
                     return 0;
@@ -251,8 +257,8 @@ class Websocket
     /**
      * Websocket encode.
      *
-     * @param mixed $buffer
-     * @param TcpConnection $connection
+     * @param  mixed         $buffer
+     * @param  TcpConnection $connection
      * @return string
      */
     public static function encode(mixed $buffer, TcpConnection $connection): string
@@ -317,8 +323,8 @@ class Websocket
     /**
      * Websocket decode.
      *
-     * @param string $buffer
-     * @param TcpConnection $connection
+     * @param  string        $buffer
+     * @param  TcpConnection $connection
      * @return string
      */
     public static function decode(string $buffer, TcpConnection $connection): string
@@ -364,9 +370,9 @@ class Websocket
     /**
      * Inflate.
      *
-     * @param TcpConnection $connection
-     * @param string $buffer
-     * @param bool $isFinFrame
+     * @param  TcpConnection $connection
+     * @param  string        $buffer
+     * @param  bool          $isFinFrame
      * @return false|string
      */
     protected static function inflate(TcpConnection $connection, string $buffer, bool $isFinFrame): bool|string
@@ -391,8 +397,8 @@ class Websocket
     /**
      * Deflate.
      *
-     * @param TcpConnection $connection
-     * @param string $buffer
+     * @param  TcpConnection $connection
+     * @param  string        $buffer
      * @return false|string
      */
     protected static function deflate(TcpConnection $connection, string $buffer): bool|string
@@ -414,8 +420,8 @@ class Websocket
     /**
      * Websocket handshake.
      *
-     * @param string $buffer
-     * @param TcpConnection $connection
+     * @param  string        $buffer
+     * @param  TcpConnection $connection
      * @return int
      */
     public static function dealHandshake(string $buffer, TcpConnection $connection): int
@@ -434,7 +440,9 @@ class Websocket
                 $SecWebSocketKey = $match[1];
             } else {
                 $connection->close(
-                    "HTTP/1.0 400 Bad Request\r\nServer: workerman\r\n\r\n<div style=\"text-align:center\"><h1>WebSocket</h1><hr>workerman</div>", true);
+                    "HTTP/1.0 400 Bad Request\r\nServer: workerman\r\n\r\n<div style=\"text-align:center\"><h1>WebSocket</h1><hr>workerman</div>",
+                    true
+                );
                 return 0;
             }
             // Calculation websocket key.
@@ -513,7 +521,9 @@ class Websocket
         }
         // Bad websocket handshake request.
         $connection->close(
-            "HTTP/1.0 400 Bad Request\r\nServer: workerman\r\n\r\n<div style=\"text-align:center\"><h1>400 Bad Request</h1><hr>workerman</div>", true);
+            "HTTP/1.0 400 Bad Request\r\nServer: workerman\r\n\r\n<div style=\"text-align:center\"><h1>400 Bad Request</h1><hr>workerman</div>",
+            true
+        );
         return 0;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -11,9 +12,10 @@ declare(strict_types=1);
 
 namespace Workerman\Protocols\Http\Session;
 
-use Exception;
-use Workerman\Protocols\Http\Session;
 use function clearstatcache;
+
+use Exception;
+
 use function file_get_contents;
 use function file_put_contents;
 use function filemtime;
@@ -28,6 +30,8 @@ use function sys_get_temp_dir;
 use function time;
 use function touch;
 use function unlink;
+
+use Workerman\Protocols\Http\Session;
 
 /**
  * Class FileSessionHandler
@@ -118,7 +122,7 @@ class FileSessionHandler implements SessionHandlerInterface
      * @see https://www.php.net/manual/zh/function.touch.php
      *
      * @param string $sessionId Session id.
-     * @param string $data Session Data.
+     * @param string $data      Session Data.
      *
      * @return bool
      */
@@ -172,7 +176,7 @@ class FileSessionHandler implements SessionHandlerInterface
     /**
      * Get session file path.
      *
-     * @param string $sessionId
+     * @param  string $sessionId
      * @return string
      */
     protected static function sessionFile(string $sessionId): string
@@ -183,7 +187,7 @@ class FileSessionHandler implements SessionHandlerInterface
     /**
      * Get or set session file path.
      *
-     * @param string $path
+     * @param  string $path
      * @return string
      */
     public static function sessionSavePath(string $path): string
