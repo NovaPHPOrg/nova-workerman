@@ -15,7 +15,8 @@ declare(strict_types=1);
  */
 
 // set_time_limit
-use adapter\WorkermanApp;
+
+use nova\plugin\workerman\adapter\WorkermanApp;
 use Workerman\Connection\TcpConnection;
 
 if (!function_exists('set_time_limit')) {

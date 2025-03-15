@@ -15,7 +15,8 @@ declare(strict_types=1);
  */
 // header,header_remove,headers_sent,headers_list,http_response_code
 
-use adapter\WorkermanApp;
+
+use nova\plugin\workerman\adapter\WorkermanApp;
 
 if (!function_exists('header')) {
     function header($string, bool $replace = true, int $http_response_code = null): void

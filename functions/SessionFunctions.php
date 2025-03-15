@@ -14,11 +14,10 @@ declare(strict_types=1);
  * Session 相关功能重写
  */
 
-use adapter\WorkermanApp;
+use nova\framework\core\Context;
+use nova\plugin\workerman\adapter\WorkermanApp;
 use Random\RandomException;
 use Workerman\Protocols\Http\Request;
-use Workerman\Protocols\Http\Session;
-use Workerman\Protocols\Http\Session\FileSessionHandler;
 
 if (!function_exists('session_commit')) {
     function session_commit(): void
@@ -39,10 +38,10 @@ if (!function_exists('session_create_id')) {
 }
 
 if (!function_exists('session_destroy')) {
-    function session_destroy(): void
+    function session_destroy(): bool
     {
-        // — 销毁一个会话中的全部数据
-        WorkermanApp::instance()->session()?->flush();
+        $_SESSION = [];
+        return WorkermanApp::instance()->session()?->clear() ?? false;
     }
 }
 
@@ -57,13 +56,25 @@ if (!function_exists('session_gc')) {
 if (!function_exists('session_get_cookie_params')) {
     function session_get_cookie_params(): array
     {
+        $context = Context::instance();
         return [
-            'lifetime' => Session::$lifetime,
-            'path' => Session::$cookiePath,
-            'domain' => Session::$domain,
-            'secure' => Session::$secure,
-            'httponly' => Session::$httpOnly,
-            'samesite' => Session::$sameSite,
+           // 会话生命周期（秒），默认24小时
+        'lifetime' => $context->get('session_lifetime', 86400),
+        
+        // Cookie路径，默认网站根目录
+        'path' => $context->get('session_path', '/'),
+        
+        // Cookie域名，默认空（当前域名）
+        'domain' => $context->get('session_domain', ''),
+        
+        // 是否仅通过HTTPS传输，默认自动检测
+        'secure' => $context->get('session_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+        
+        // 是否仅允许HTTP访问，默认true以提高安全性
+        'httponly' => $context->get('session_httponly', true),
+        
+        // SameSite属性，默认Lax（更好的安全性和兼容性平衡）
+        'samesite' => $context->get('session_samesite', 'Lax'),
         ];
     }
 }
@@ -73,7 +84,7 @@ if (!function_exists('session_id')) {
     {
         /* @var Request $req */
         try {
-            return WorkermanApp::instance()->request()->sessionId($id);
+            return WorkermanApp::instance()->session()->id($id);
         } catch (Exception $e) {
             return '';
         }
@@ -85,9 +96,9 @@ if (!function_exists('session_name')) {
     {
         // — 读取/设置会话名称
         if ($name === null) {
-            return Session::$name;
+            return Context::instance()->get('session_name',"NovaSession");
         } else {
-            Session::$name = $name;
+            Context::instance()->set('session_name',$name);
         }
         return null;
     }
@@ -108,9 +119,9 @@ if (!function_exists('session_save_path')) {
     function session_save_path(string $path = null): ?string
     {
         if ($path === null) {
-            return ini_get('session.save_path');
+            return Context::instance()->get('session_save_path', sys_get_temp_dir());
         }
-        FileSessionHandler::sessionSavePath($path);
+        Context::instance()->set('session_save_path', sys_get_temp_dir());
         return null;
         // — 读取/设置当前会话的保存路径
     }
@@ -121,70 +132,90 @@ if (!function_exists('session_set_cookie_params')) {
     {
         // — 设置会话 cookie 参数
         if (isset($options['lifetime'])) {
-            Session::$lifetime = $options['lifetime'];
+            Context::instance()->set('session_lifetime', $options['lifetime']);
         }
         if (isset($options['path'])) {
-            Session::$cookiePath = $options['path'];
+           Context::instance()->set('session_path', $options['path']);
         }
         if (isset($options['domain'])) {
-            Session::$domain = $options['domain'];
+           Context::instance()->set('session_domain', $options['domain']);
         }
         if (isset($options['secure'])) {
-            Session::$secure = $options['secure'];
+           Context::instance()->set('session_secure', $options['secure']);
         }
         if (isset($options['httponly'])) {
-            Session::$httpOnly = $options['httponly'];
+            Context::instance()->set('session_httponly', $options['httponly']);
         }
         if (isset($options['samesite'])) {
-            Session::$sameSite = $options['samesite'];
+            Context::instance()->set('session_samesite', $options['samesite']);
         }
     }
 }
 
 if (!function_exists('session_set_save_handler')) {
-    function session_set_save_handler(string $sessionHandler): void
+    function session_set_save_handler(SessionHandlerInterface $sessionHandler): void
     {
-        // — 设置用户自定义会话存储函数
-        Session::handlerClass($sessionHandler);
-        Session::$name = ini_get('session.name') ?? "NovaSession";
+        WorkermanApp::instance()->session()->setHandler($sessionHandler);
     }
 }
 
 if (!function_exists('session_start')) {
     function session_start(): void
     {
-        WorkermanApp::instance()->session();
+        $context = Context::instance();
+        if (!isset($_SESSION)) {
+            $_SESSION = [];
+        }
+        $app = WorkermanApp::instance();
+        $session = $app->session();
+        if ($session) {
+            $session->setOptions(
+                $context->get('session_name',"NovaSession"),[
+                'lifetime' => $context->get('session_lifetime', 86400),
+                'path' => $context->get('session_path', '/'),
+                'domain' => $context->get('session_domain', ''),
+                'secure' => $context->get('session_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+                'httponly' => $context->get('session_httponly', true),
+                'samesite' => $context->get('session_samesite', 'Lax'),
+            ]);
+            $session->start();
+        }
     }
 }
 
 if (!function_exists('session_status')) {
     function session_status(): int
     {
-        // — 返回当前会话状态
-        try {
-            if (WorkermanApp::instance()->session() == null) {
-                return PHP_SESSION_NONE;
-            } else {
-                return PHP_SESSION_ACTIVE;
-            }
-        } catch (Exception $e) {
+        if (WorkermanApp::instance()->session(false) === null) {
             return PHP_SESSION_NONE;
         }
+        if (WorkermanApp::instance()->session(false)->isStarted()) {
+            return PHP_SESSION_ACTIVE;
+        }
+        // — 返回当前会话状态
+        return PHP_SESSION_NONE;
     }
 }
 
 if (!function_exists('session_unset')) {
-    function session_unset()
+    function session_unset(): bool
     {
-        // — 释放所有的会话变量
-        session_destroy();
+        if (isset($_SESSION)) {
+            $_SESSION = [];
+            return true;
+        }
+        return false;
     }
 }
 
 if (!function_exists('session_write_close')) {
-    function session_write_close(): void
+    function session_write_close(): bool
     {
-        WorkermanApp::instance()->session()?->save();
-
+        $session = WorkermanApp::instance()->session(false);
+        if ($session) {
+            $session->save();
+            return true;
+        }
+        return false;
     }
 }

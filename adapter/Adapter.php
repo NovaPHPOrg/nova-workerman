@@ -10,7 +10,7 @@ declare(strict_types=1);
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-namespace adapter;
+namespace nova\plugin\workerman\adapter;
 
 use Workerman\Protocols\Http\Request;
 
@@ -66,6 +66,8 @@ class Adapter
         foreach ($request->cookie() as $key => $value) {
             $_COOKIE[$key] = $value;
         }
+
+
         $_GET = [];
         // 处理get
         foreach ($request->get() as $key => $value) {
@@ -82,15 +84,7 @@ class Adapter
             $_FILES[$key] = $value;
         }
         $_REQUEST = array_merge($_GET, $_POST);
-        $_SESSION = [];
 
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            try {
-                $_SESSION = $request->session()->all();
-            } catch (\Exception $e) {
-                $_SESSION = [];
-            }
-        }
 
         //$_ENV = [];
         $_SERVER['CONTENT_LENGTH'] = $request->header('content-length') ?? 0;

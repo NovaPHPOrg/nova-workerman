@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace adapter;
+namespace nova\plugin\workerman\adapter;
 
 use nova\framework\App;
 use nova\framework\core\Context;
@@ -20,7 +20,6 @@ use Workerman\Connection\TcpConnection;
 use Workerman\Protocols\Http\Request;
 use Workerman\Protocols\Http\Response;
 use Workerman\Protocols\Http\ServerSentEvents;
-use Workerman\Protocols\Http\Session;
 
 /**
  * WorkermanApp 类
@@ -35,6 +34,9 @@ class WorkermanApp
     protected Request $request;
 
     protected TcpConnection $connection;
+
+
+    protected ?WorkermanSession $session = null;
 
     /**
      * 获取 WorkermanApp 实例
@@ -180,13 +182,19 @@ class WorkermanApp
 
     /**
      * 获取会话对象
-     * @return Session|null 返回会话对象，如果创建失败则返回 null
+     * @param bool $createOnNull 如果会话不存在是否创建新会话
+     * @return WorkermanSession|null 返回会话对象，如果创建失败则返回 null
      */
-    public function session(): ?Session
+    public function session(bool $createOnNull = true): ?WorkermanSession
     {
         try {
-            return $this->request->session();
-        } catch (\Exception $e) {
+            if ($this->session === null && $createOnNull) {
+                $this->session = new WorkermanSession();
+            }
+            return $this->session;
+        } catch (\Throwable $e) {
+            // 记录异常信息
+            error_log("Session creation failed: " . $e->getMessage());
             return null;
         }
     }

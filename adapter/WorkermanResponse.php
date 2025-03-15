@@ -10,7 +10,7 @@ declare(strict_types=1);
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-namespace adapter;
+namespace nova\plugin\workerman\adapter;
 
 use nova\framework\http\Response;
 

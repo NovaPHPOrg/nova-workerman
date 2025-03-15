@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace nova\plugin\workerman;
 
-use adapter\Adapter;
-use adapter\WorkermanApp;
+
 use FilesystemIterator;
+use nova\plugin\workerman\adapter\Adapter;
+use nova\plugin\workerman\adapter\WorkermanApp;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Workerman\Connection\TcpConnection;
