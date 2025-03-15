@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace nova\plugin\workerman;
 
-
 use FilesystemIterator;
 use nova\plugin\workerman\adapter\Adapter;
 use nova\plugin\workerman\adapter\WorkermanApp;
@@ -118,7 +117,7 @@ $http_worker->onMessage = function (TcpConnection $connection, Request $request)
                         return gettype($arg);
                     }
                 }, $trace['args']) : [];
-                
+
                 $traces[] = sprintf(
                     "#%d %s(%d): %s%s%s(%s)",
                     $i,
@@ -141,12 +140,12 @@ $http_worker->onMessage = function (TcpConnection $connection, Request $request)
                 php_ini_loaded_file() ?: '未加载配置文件',
                 php_ini_scanned_files() ?: '无额外配置目录',
                 count($extensions),
-                implode("\n ", array_map(function($ext) {
+                implode("\n ", array_map(function ($ext) {
                     $version = phpversion($ext);
                     return $version ? "$ext(v$version)" : $ext;
                 }, $extensions))
             );
-            
+
             $error = sprintf(
                 "严重错误!\n\n错误类型: [%s]\n错误信息: %s\n文件位置: %s\n错误行号: %d\n\n完整堆栈信息:\n%s%s",
                 get_class($e),
@@ -156,7 +155,7 @@ $http_worker->onMessage = function (TcpConnection $connection, Request $request)
                 implode("\n", $traces),
                 $extensionInfo
             );
-            
+
             $style = "
                 <style>
                     .error-container { 
@@ -171,7 +170,7 @@ $http_worker->onMessage = function (TcpConnection $connection, Request $request)
                     }
                 </style>
             ";
-            
+
             $connection->send($style . '<div class="error-container">' . htmlspecialchars($error) . '</div>');
         } else {
             $connection->send("Internal Server Error");

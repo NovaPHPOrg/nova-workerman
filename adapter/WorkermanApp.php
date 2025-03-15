@@ -35,7 +35,6 @@ class WorkermanApp
 
     protected TcpConnection $connection;
 
-
     protected ?WorkermanSession $session = null;
 
     /**
@@ -182,7 +181,7 @@ class WorkermanApp
 
     /**
      * 获取会话对象
-     * @param bool $createOnNull 如果会话不存在是否创建新会话
+     * @param  bool                  $createOnNull 如果会话不存在是否创建新会话
      * @return WorkermanSession|null 返回会话对象，如果创建失败则返回 null
      */
     public function session(bool $createOnNull = true): ?WorkermanSession

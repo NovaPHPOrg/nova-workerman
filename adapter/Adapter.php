@@ -67,7 +67,6 @@ class Adapter
             $_COOKIE[$key] = $value;
         }
 
-
         $_GET = [];
         // 处理get
         foreach ($request->get() as $key => $value) {
@@ -84,7 +83,6 @@ class Adapter
             $_FILES[$key] = $value;
         }
         $_REQUEST = array_merge($_GET, $_POST);
-
 
         //$_ENV = [];
         $_SERVER['CONTENT_LENGTH'] = $request->header('content-length') ?? 0;

@@ -1,8 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
 namespace nova\plugin\workerman\adapter;
-
 
 use nova\plugin\cookie\Cookie;
 use SessionHandlerInterface;
@@ -15,7 +15,6 @@ class WorkermanSession
 {
     /** @var string 会话ID */
     private string $sessionId;
-
 
     /** @var int 会话过期时间（秒） */
     private int $lifetime;
@@ -51,12 +50,11 @@ class WorkermanSession
     {
         $this->lifetime = $this->options['lifetime'];
         $this->savePath = sys_get_temp_dir() . '/nova_sessions';
-        
+
         // 确保会话存储目录存在
         if (!is_dir($this->savePath)) {
             mkdir($this->savePath, 0777, true);
         }
-
 
     }
 
@@ -68,9 +66,7 @@ class WorkermanSession
             return;
         }
 
-
         $sessionId = Cookie::getInstance()->get($this->sessionName);
-
 
         if (empty($sessionId)) {
             $this->newSession = true;
@@ -85,7 +81,7 @@ class WorkermanSession
         // 加载会话数据
         $this->loadSession();
 
-        if ($this->newSession){
+        if ($this->newSession) {
             setcookie(
                 $this->sessionName,
                 $this->sessionId,
@@ -111,7 +107,7 @@ class WorkermanSession
 
     /**
      * 设置会话处理器
-     * @param SessionHandlerInterface $handler
+     * @param  SessionHandlerInterface $handler
      * @return bool
      */
     public function setHandler(SessionHandlerInterface $handler): bool
@@ -134,7 +130,7 @@ class WorkermanSession
      * 设置会话配置选项
      * @param array $options
      */
-    public function setOptions($name,array $options): void
+    public function setOptions($name, array $options): void
     {
         $this->options = array_merge($this->options, $options);
         $this->lifetime = $this->options['lifetime'];
@@ -244,7 +240,7 @@ class WorkermanSession
         }
 
         if ($this->handler) {
-            $this->handler->write($this->sessionId, serialize( $_SESSION));
+            $this->handler->write($this->sessionId, serialize($_SESSION));
         } else {
             $this->saveDefaultSession();
         }
@@ -264,8 +260,8 @@ class WorkermanSession
 
     /**
      * 获取会话值
-     * @param string $key 键名
-     * @param mixed $default 默认值
+     * @param  string $key     键名
+     * @param  mixed  $default 默认值
      * @return mixed
      */
     public function get(string $key, mixed $default = null): mixed
@@ -278,8 +274,8 @@ class WorkermanSession
 
     /**
      * 设置会话值
-     * @param string $key 键名
-     * @param mixed $value 值
+     * @param string $key   键名
+     * @param mixed  $value 值
      */
     public function set(string $key, mixed $value): void
     {
@@ -292,7 +288,7 @@ class WorkermanSession
 
     /**
      * 魔术方法：获取会话值
-     * @param string $name
+     * @param  string $name
      * @return mixed
      */
     public function __get(string $name): mixed
@@ -303,7 +299,7 @@ class WorkermanSession
     /**
      * 魔术方法：设置会话值
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function __set(string $name, mixed $value): void
     {
@@ -312,7 +308,7 @@ class WorkermanSession
 
     /**
      * 魔术方法：检查会话值是否存在
-     * @param string $name
+     * @param  string $name
      * @return bool
      */
     public function __isset(string $name): bool
@@ -381,7 +377,7 @@ class WorkermanSession
 
     /**
      * 检查会话键是否存在
-     * @param string $key 键名
+     * @param  string $key 键名
      * @return bool
      */
     public function has(string $key): bool
@@ -389,9 +385,8 @@ class WorkermanSession
         if (!$this->started) {
             return false;
         }
-        return isset( $_SESSION[$key]);
+        return isset($_SESSION[$key]);
     }
-
 
     /**
      * 析构函数，确保会话数据被保存并关闭处理器

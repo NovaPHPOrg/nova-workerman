@@ -58,23 +58,23 @@ if (!function_exists('session_get_cookie_params')) {
     {
         $context = Context::instance();
         return [
-           // 会话生命周期（秒），默认24小时
-        'lifetime' => $context->get('session_lifetime', 86400),
-        
-        // Cookie路径，默认网站根目录
-        'path' => $context->get('session_path', '/'),
-        
-        // Cookie域名，默认空（当前域名）
-        'domain' => $context->get('session_domain', ''),
-        
-        // 是否仅通过HTTPS传输，默认自动检测
-        'secure' => $context->get('session_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-        
-        // 是否仅允许HTTP访问，默认true以提高安全性
-        'httponly' => $context->get('session_httponly', true),
-        
-        // SameSite属性，默认Lax（更好的安全性和兼容性平衡）
-        'samesite' => $context->get('session_samesite', 'Lax'),
+            // 会话生命周期（秒），默认24小时
+            'lifetime' => $context->get('session_lifetime', 86400),
+
+            // Cookie路径，默认网站根目录
+            'path' => $context->get('session_path', '/'),
+
+            // Cookie域名，默认空（当前域名）
+            'domain' => $context->get('session_domain', ''),
+
+            // 是否仅通过HTTPS传输，默认自动检测
+            'secure' => $context->get('session_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+
+            // 是否仅允许HTTP访问，默认true以提高安全性
+            'httponly' => $context->get('session_httponly', true),
+
+            // SameSite属性，默认Lax（更好的安全性和兼容性平衡）
+            'samesite' => $context->get('session_samesite', 'Lax'),
         ];
     }
 }
@@ -96,9 +96,9 @@ if (!function_exists('session_name')) {
     {
         // — 读取/设置会话名称
         if ($name === null) {
-            return Context::instance()->get('session_name',"NovaSession");
+            return Context::instance()->get('session_name', "NovaSession");
         } else {
-            Context::instance()->set('session_name',$name);
+            Context::instance()->set('session_name', $name);
         }
         return null;
     }
@@ -135,13 +135,13 @@ if (!function_exists('session_set_cookie_params')) {
             Context::instance()->set('session_lifetime', $options['lifetime']);
         }
         if (isset($options['path'])) {
-           Context::instance()->set('session_path', $options['path']);
+            Context::instance()->set('session_path', $options['path']);
         }
         if (isset($options['domain'])) {
-           Context::instance()->set('session_domain', $options['domain']);
+            Context::instance()->set('session_domain', $options['domain']);
         }
         if (isset($options['secure'])) {
-           Context::instance()->set('session_secure', $options['secure']);
+            Context::instance()->set('session_secure', $options['secure']);
         }
         if (isset($options['httponly'])) {
             Context::instance()->set('session_httponly', $options['httponly']);
@@ -170,14 +170,16 @@ if (!function_exists('session_start')) {
         $session = $app->session();
         if ($session) {
             $session->setOptions(
-                $context->get('session_name',"NovaSession"),[
-                'lifetime' => $context->get('session_lifetime', 86400),
-                'path' => $context->get('session_path', '/'),
-                'domain' => $context->get('session_domain', ''),
-                'secure' => $context->get('session_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-                'httponly' => $context->get('session_httponly', true),
-                'samesite' => $context->get('session_samesite', 'Lax'),
-            ]);
+                $context->get('session_name', "NovaSession"),
+                [
+                    'lifetime' => $context->get('session_lifetime', 86400),
+                    'path' => $context->get('session_path', '/'),
+                    'domain' => $context->get('session_domain', ''),
+                    'secure' => $context->get('session_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+                    'httponly' => $context->get('session_httponly', true),
+                    'samesite' => $context->get('session_samesite', 'Lax'),
+                ]
+            );
             $session->start();
         }
     }
