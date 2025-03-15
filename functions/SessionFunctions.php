@@ -69,11 +69,11 @@ if (!function_exists('session_get_cookie_params')) {
 }
 
 if (!function_exists('session_id')) {
-    function session_id($id = null)
+    function session_id($id = null): string
     {
         /* @var Request $req */
         try {
-            WorkermanApp::instance()->request()->sessionId($id);
+            return WorkermanApp::instance()->request()->sessionId($id);
         } catch (Exception $e) {
             return '';
         }
@@ -85,9 +85,9 @@ if (!function_exists('session_name')) {
     {
         // — 读取/设置会话名称
         if ($name === null) {
-            return ini_get('session.name');
+            return Session::$name;
         } else {
-            ini_set('session.name', $name);
+            Session::$name = $name;
         }
         return null;
     }
@@ -142,21 +142,11 @@ if (!function_exists('session_set_cookie_params')) {
 }
 
 if (!function_exists('session_set_save_handler')) {
-    function session_set_save_handler($sessionHandler, bool $registerShutdown = true): void
+    function session_set_save_handler(string $sessionHandler): void
     {
         // — 设置用户自定义会话存储函数
-        Session::handlerClass(get_class($sessionHandler));
-        // 创建一个反射类实例，用于访问和操作 Session 类
-        $reflector = new ReflectionClass('Workerman\Protocols\Http\Session');
-
-        // 获取私有静态属性 $_handler 的 ReflectionProperty 对象
-        $property = $reflector->getProperty('_handler');
-
-        // 设置私有属性为可访问
-        $property->setAccessible(true);
-
-        // 给 $_handler 属性赋值为 $sessionHandler
-        $property->setValue(null, $sessionHandler); // null 表示这是一个静态属性
+        Session::handlerClass($sessionHandler);
+        Session::$name = ini_get('session.name') ?? "NovaSession";
     }
 }
 

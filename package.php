@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 return [
     "config" => [
-        'ip'=>'0.0.0.0',
+        'ip' => '0.0.0.0',
         'port' => '9000',
     ]
 ];

@@ -193,7 +193,7 @@ class WorkermanApp
 
     public function sendResponse(): void
     {
-        $this->connection->send($this->response);
+        $this->connection->send($this->response->withBody(ob_get_contents() ?: ""));
     }
 
     public function sendSSE(array $data): void

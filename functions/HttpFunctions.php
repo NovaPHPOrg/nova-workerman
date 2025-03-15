@@ -20,8 +20,19 @@ use adapter\WorkermanApp;
 if (!function_exists('header')) {
     function header($string, bool $replace = true, int $http_response_code = null): void
     {
-        [$key, $value] = explode(':', $string, 2);
-        WorkermanApp::instance()->header($key, $value);
+        // 处理 HTTP 状态码的情况
+        if (preg_match('/^HTTP\/\d\.\d\s+(\d+)(?:\s+(.+))?$/i', $string, $matches)) {
+            http_response_code((int)$matches[1]);
+            return;
+        }
+
+        // 处理普通 header
+        $parts = explode(':', $string, 2);
+        if (count($parts) !== 2) {
+            throw new \InvalidArgumentException('Invalid header format');
+        }
+        [$key, $value] = $parts;
+        WorkermanApp::instance()->header(trim($key), trim($value));
         if ($http_response_code !== null) {
             http_response_code($http_response_code);
         }
