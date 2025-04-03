@@ -87,6 +87,7 @@ class WorkermanApp
         $context->setResponseClass(WorkermanResponse::class);
         // 加载助手函数
         require_once "$dir/nova/framework/helper.php";
+        $context->init();
         //创建响应
         $this->response = new Response();
     }
