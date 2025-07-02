@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# 作用：自动写入自定义 ini，再调用 bootstrap.php
+set -e
+
+DIR="$(cd "$(dirname "$0")" && pwd)"
+CONF_DIR="$DIR/conf.d"
+INI_FILE="$CONF_DIR/99-custom.ini"
+
+# 首次运行时写入自定义 ini（若已存在则跳过）
+if [ ! -f "$INI_FILE" ]; then
+  mkdir -p "$CONF_DIR"
+  cat >"$INI_FILE" <<'EOF'
+opcache.enable=1
+opcache.enable_cli=1
+opcache.validate_timestamps=0
+opcache.save_comments=0
+opcache.enable_file_override=1
+opcache.huge_code_pages=1
+
+memory_limit=512M
+
+opcache.jit_buffer_size=128M
+opcache.jit=tracing
+
+disable_functions=header,header_remove,headers_sent,headers_list,http_response_code,setcookie,session_create_id,session_id,session_name,session_save_path,session_status,session_start,session_write_close,session_regenerate_id,session_unset,session_get_cookie_params,session_set_cookie_params,session_set_save_handler,set_time_limit,connection_aborted
+;disable_classes=
+EOF
+fi
+
+# 把 conf.d 目录追加到 PHP_INI_SCAN_DIR，然后执行 Workerman
+export PHP_INI_SCAN_DIR="$CONF_DIR"
+exec php "$DIR/bootstrap.php" "$@"
