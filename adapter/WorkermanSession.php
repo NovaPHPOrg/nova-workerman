@@ -400,6 +400,9 @@ class WorkermanSession
 
     public function id(?string $id = null): string
     {
+        if(!$this->started){
+            $this->start();
+        }
         return $id ?? $this->sessionId;
     }
 
