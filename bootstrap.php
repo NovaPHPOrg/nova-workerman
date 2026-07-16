@@ -25,9 +25,6 @@ use Workerman\Worker;
 date_default_timezone_set('Asia/Shanghai');
 require_once  __DIR__ ."/start.php";
 $configFile = __DIR__ . '/../../../config.php';
-if (file_exists('/.dockerenv') && file_exists(__DIR__ . '/../../../docker.config.php')) {
-    $configFile = __DIR__ . '/../../../docker.config.php';
-}
 $config = file_exists($configFile) ? require_once $configFile : [];
 if (!is_array($config)) {
     $config = [];
