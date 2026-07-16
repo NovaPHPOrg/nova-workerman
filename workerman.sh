@@ -28,5 +28,5 @@ EOF
 fi
 
 # 把 conf.d 目录追加到 PHP_INI_SCAN_DIR，然后执行 Workerman
-export PHP_INI_SCAN_DIR="$CONF_DIR"
+export PHP_INI_SCAN_DIR=":$CONF_DIR"
 exec php "$DIR/bootstrap.php" "$@"

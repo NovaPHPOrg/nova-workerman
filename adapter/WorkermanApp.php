@@ -77,12 +77,13 @@ class WorkermanApp
          */
 
         $dir = dirname(__DIR__, 4);
-        // 加载框架核心的自动加载器
-        require_once "$dir/nova/framework/core/Loader.php";
-        $loader = new Loader();
+
+        // 使用全局单例 Loader，避免每个请求都重复注册 autoloader
+        global $globalLoader;
+
         global $context;
         // 初始化应用程序上下文
-        $context = new Context($loader);
+        $context = new Context($globalLoader);
 
         $context->setResponseClass(WorkermanResponse::class);
         // 加载助手函数

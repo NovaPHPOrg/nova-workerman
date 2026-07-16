@@ -13,6 +13,10 @@ declare(strict_types=1);
 // autoload注册
 spl_autoload_register(function ($class) {
     $class = str_replace('\\', '/', $class);
+    // Fix case-sensitivity issue on Linux for WorkerMan directory
+    if (str_starts_with($class, 'Workerman/')) {
+        $class = 'WorkerMan/' . substr($class, 10);
+    }
     $file = __DIR__ . "/$class.php";
     if (file_exists($file)) {
         require_once $file;

@@ -24,10 +24,27 @@ use Workerman\Worker;
 
 date_default_timezone_set('Asia/Shanghai');
 require_once  __DIR__ ."/start.php";
-$config = require_once __DIR__ . '/../../../config.php';
+$configFile = __DIR__ . '/../../../config.php';
+if (file_exists('/.dockerenv') && file_exists(__DIR__ . '/../../../docker.config.php')) {
+    $configFile = __DIR__ . '/../../../docker.config.php';
+}
+$config = file_exists($configFile) ? require_once $configFile : [];
+if (!is_array($config)) {
+    $config = [];
+}
 Adapter::loadFunctions();
+// 全局初始化一次 Loader，避免每次请求重复注册 autoloader 导致内存泄露
+require_once dirname(__DIR__, 3) . "/nova/framework/core/Loader.php";
+global $globalLoader;
+$globalLoader = new \nova\framework\core\Loader();
+
 // #### http worker ####
-$http_worker = new Worker("http://{$config['ip']}:{$config['port']}");
+$ip = $config['ip'] ?? '0.0.0.0';
+$port = $config['port'] ?? 9528;
+Worker::$pidFile = sys_get_temp_dir() . '/workerman_' . md5(__DIR__) . '.pid';
+Worker::$logFile = sys_get_temp_dir() . '/workerman.log';
+
+$http_worker = new Worker("http://{$ip}:{$port}");
 
 $http_worker->name = 'Nova WorkerMan';
 // 获取CPU核心数量，根据实际情况设置
@@ -72,6 +89,10 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
                 if ($file_mtime > $file_mtime_map[$file_path]) {
                     echo "[".date('Y-m-d H:i:s')."] $file_path updated , reloading...\n";
 
+                    if (function_exists('opcache_reset')) {
+                        opcache_reset();
+                    }
+
                     // Windows 和 UNIX/Linux 系统使用不同的重载方式
                     if (DIRECTORY_SEPARATOR === '\\') {
                         // Windows 系统
@@ -91,10 +112,8 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
 
 };
 
-define('MAX_REQUEST', 1000);
 // Emitted when data received
 $http_worker->onMessage = function (TcpConnection $connection, Request $request) {
-    static $request_count = 0;
 
     try {
         Adapter::InitServerVar($request);
@@ -177,11 +196,6 @@ $http_worker->onMessage = function (TcpConnection $connection, Request $request)
         }
     } finally {
         $workermanApp = null;
-    }
-
-    // 优化内存管理策略
-    if (++$request_count >= MAX_REQUEST) {  // 调整为更合理的频率
-        Worker::stopAll();
     }
 };
 
