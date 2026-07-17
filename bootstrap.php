@@ -47,7 +47,8 @@ $http_worker->name = 'Nova WorkerMan';
 // 获取CPU核心数量，根据实际情况设置
 $cpuCount = cpu_count();
 $http_worker->count = $cpuCount * 2;  // 一般建议设置为CPU核心数的1-2倍
-$http_worker->reloadable = false;
+// 必须为 true：否则文件监控发 SIGUSR1 只打日志，worker 不退出，代码/配置永不刷新
+$http_worker->reloadable = true;
 $http_worker->onWorkerStart = function ($worker) use ($config) {
     if (!Worker::$daemonize
         && $worker->id === 0
@@ -68,12 +69,16 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
                     continue;
                 }
 
-                // 只检查 PHP 文件
-                if (pathinfo($file->getFilename(), PATHINFO_EXTENSION) !== 'php') {
+                $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
+                // php：业务代码；ini：仅用于提示需要 restart（ini 无法热加载）
+                if ($ext !== 'php' && $ext !== 'ini') {
                     continue;
                 }
 
                 $file_path = $file->getRealPath(); // 获取完整路径
+                if ($file_path === false) {
+                    continue;
+                }
                 $file_mtime = $file->getMTime();   // 获取文件修改时间
 
                 // 如果文件不在 map 中，初始化它
@@ -84,6 +89,13 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
 
                 // 只有当当前文件的修改时间比记录的时间大时，才触发重载
                 if ($file_mtime > $file_mtime_map[$file_path]) {
+                    $file_mtime_map[$file_path] = $file_mtime;
+
+                    if ($ext === 'ini') {
+                        echo "[".date('Y-m-d H:i:s')."] $file_path updated — php.ini 变更需要 restart，reload 无效\n";
+                        continue;
+                    }
+
                     echo "[".date('Y-m-d H:i:s')."] $file_path updated , reloading...\n";
 
                     if (function_exists('opcache_reset')) {
@@ -99,9 +111,6 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
                         // UNIX/Linux 系统
                         posix_kill(posix_getppid(), SIGUSR1);
                     }
-
-                    // 更新该文件的修改时间
-                    $file_mtime_map[$file_path] = $file_mtime;
                 }
             }
         });
