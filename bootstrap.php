@@ -70,8 +70,8 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
                 }
 
                 $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
-                // php：业务代码；ini：仅用于提示需要 restart（ini 无法热加载）
-                if ($ext !== 'php' && $ext !== 'ini') {
+                // php：业务/编译缓存；tpl：模板源；ini：仅提示需 restart（进程 ini 无法热加载）
+                if ($ext !== 'php' && $ext !== 'tpl' && $ext !== 'ini') {
                     continue;
                 }
 
@@ -79,6 +79,8 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
                 if ($file_path === false) {
                     continue;
                 }
+                // SplFileInfo 可能吃到 stat 缓存，热更场景必须清
+                clearstatcache(true, $file_path);
                 $file_mtime = $file->getMTime();   // 获取文件修改时间
 
                 // 如果文件不在 map 中，初始化它
@@ -98,6 +100,9 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
 
                     echo "[".date('Y-m-d H:i:s')."] $file_path updated , reloading...\n";
 
+                    if (function_exists('opcache_invalidate')) {
+                        opcache_invalidate($file_path, true);
+                    }
                     if (function_exists('opcache_reset')) {
                         opcache_reset();
                     }
