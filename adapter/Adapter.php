@@ -87,5 +87,8 @@ class Adapter
         //$_ENV = [];
         $_SERVER['CONTENT_LENGTH'] = $request->header('content-length') ?? 0;
         $_SERVER['CONTENT_TYPE'] = $request->header('content-type') ?? "";
+
+        // Workerman 没有 php://input，把原始 body 挂到全局供 Arguments::raw() 读取
+        $GLOBALS['__NOVA_HTTP_RAW_BODY'] = $request->rawBody();
     }
 }
