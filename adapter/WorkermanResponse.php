@@ -35,8 +35,50 @@ class WorkermanResponse extends Response
         }
     }
 
+    /**
+     * Workerman 下不能走父类 sendFile：
+     * 父类会 ob_end_clean 掉 WorkermanApp::run() 的缓冲区，且 echo 进不了 Response body。
+     * 改用协议层 withFile，由 Http::encode 流式读盘发送。
+     */
     protected function sendFile(): void
     {
+        if ($this->code === 404 || !is_string($this->data) || !is_file($this->data)) {
+            $this->code = 404;
+            $this->sendHeaders();
+            echo is_string($this->data) && $this->data !== '' ? $this->data : 'File not found';
+            return;
+        }
 
+        $fileSize = filesize($this->data);
+        if ($fileSize === false) {
+            $this->code = 404;
+            $this->sendHeaders();
+            echo 'File not found';
+            return;
+        }
+
+        $offset = 0;
+        $length = 0; // 0 = 从 offset 读到文件末尾（Workerman 约定）
+        $range = $this->parseRange($fileSize);
+        if ($range !== null) {
+            [$start, $end] = $range;
+            $offset = $start;
+            $length = $end - $start + 1;
+            $this->code = 206;
+            $this->header['Content-Range'] = "bytes $start-$end/$fileSize";
+            $this->header['Content-Length'] = $length;
+        } else {
+            $this->code = 200;
+            $this->header['Content-Length'] = $fileSize;
+        }
+
+        $this->sendHeaders();
+        if ($this->isHead()) {
+            return;
+        }
+
+        WorkermanApp::instance()->response()
+            ->withStatus($this->code)
+            ->withFile($this->data, $offset, $length);
     }
 }
