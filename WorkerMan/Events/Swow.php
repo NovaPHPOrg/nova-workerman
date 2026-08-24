@@ -12,10 +12,11 @@ declare(strict_types=1);
 
 namespace Workerman\Events;
 
+use RuntimeException;
 use Swow\Coroutine;
 use Swow\Signal;
 use Swow\SignalException;
-
+use Throwable;
 use function Swow\Sync\waitAll;
 
 final class Swow implements EventInterface
@@ -162,7 +163,7 @@ final class Swow implements EventInterface
                         break;
                     }
                 }
-            } catch (\RuntimeException) {
+            } catch (RuntimeException) {
                 $this->offReadable($stream);
             }
         });
@@ -207,7 +208,7 @@ final class Swow implements EventInterface
                         break;
                     }
                 }
-            } catch (\RuntimeException) {
+            } catch (RuntimeException) {
                 $this->offWritable($stream);
             }
         });
@@ -295,7 +296,7 @@ final class Swow implements EventInterface
     {
         try {
             $func(...$args);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($this->errorHandler === null) {
                 echo $e;
             } else {

@@ -13,49 +13,35 @@ declare(strict_types=1);
 namespace Workerman;
 
 use AllowDynamicProperties;
-
-use function array_walk;
-use function defined;
-
-use const DIRECTORY_SEPARATOR;
-
 use Exception;
-
-use function function_exists;
-use function get_class;
-use function is_resource;
-use function method_exists;
-
-use const PHP_SAPI;
-use const PHP_VERSION;
-
-use function restore_error_handler;
-
 use Revolt\EventLoop;
 use RuntimeException;
-
-use function set_error_handler;
-
 use stdClass;
-
-use const STDOUT;
-
-use function stream_socket_accept;
-use function stream_socket_recvfrom;
-
 use Stringable;
-
-use function substr;
-
 use Throwable;
 use Workerman\Connection\ConnectionInterface;
 use Workerman\Connection\TcpConnection;
 use Workerman\Connection\UdpConnection;
-
 use Workerman\Events\Event;
 use Workerman\Events\EventInterface;
 use Workerman\Events\Revolt;
 use Workerman\Events\Select;
+use function array_walk;
+use function defined;
+use function function_exists;
+use function get_class;
+use function is_resource;
+use function method_exists;
+use function restore_error_handler;
+use function set_error_handler;
+use function str_replace;
+use function stream_socket_accept;
+use function stream_socket_recvfrom;
+use function substr;
+use const DIRECTORY_SEPARATOR;
+use const PHP_SAPI;
+use const PHP_VERSION;
+use const STDOUT;
 
 /**
  * Worker class
@@ -726,7 +712,7 @@ class Worker
 
         // Compatible with older workerman versions for pid file.
         if (empty(static::$pidFile)) {
-            $unique_prefix = \str_replace('/', '_', static::$startFile);
+            $unique_prefix = str_replace('/', '_', static::$startFile);
             $file = __DIR__ . "/../../$unique_prefix.pid";
             if (is_file($file)) {
                 static::$pidFile = $file;

@@ -33,7 +33,7 @@ if (!function_exists('session_create_id')) {
      */
     function session_create_id(): string
     {
-        return \bin2hex(pack('d', microtime(true)) . random_bytes(8));
+        return bin2hex(pack('d', microtime(true)) . random_bytes(8));
     }
 }
 

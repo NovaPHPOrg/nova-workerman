@@ -12,11 +12,14 @@ declare(strict_types=1);
 
 namespace nova\plugin\workerman;
 
+use Error;
 use FilesystemIterator;
+use nova\framework\core\Loader;
 use nova\plugin\workerman\adapter\Adapter;
 use nova\plugin\workerman\adapter\WorkermanApp;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Throwable;
 use Workerman\Connection\TcpConnection;
 use Workerman\Protocols\Http\Request;
 use Workerman\Timer;
@@ -33,7 +36,7 @@ Adapter::loadFunctions();
 // 全局初始化一次 Loader，避免每次请求重复注册 autoloader 导致内存泄露
 require_once dirname(__DIR__, 3) . "/nova/framework/core/Loader.php";
 global $globalLoader;
-$globalLoader = new \nova\framework\core\Loader();
+$globalLoader = new Loader();
 
 // #### http worker ####
 $ip = $config['ip'] ?? '0.0.0.0';
@@ -132,7 +135,7 @@ $http_worker->onMessage = function (TcpConnection $connection, Request $request)
         $workermanApp = new WorkermanApp($request, $connection);
         $response = $workermanApp->run();
         $connection->send($response);
-    } catch (\Throwable|\Error $e) {
+    } catch (Throwable|Error $e) {
         global $config;
         if ($config['debug'] ?? false) {
             // 调试模式下输出详细错误信息

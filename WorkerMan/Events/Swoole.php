@@ -16,6 +16,7 @@ use Swoole\Coroutine;
 use Swoole\Event;
 use Swoole\Process;
 use Swoole\Timer;
+use Throwable;
 
 final class Swoole implements EventInterface
 {
@@ -275,7 +276,7 @@ final class Swoole implements EventInterface
     {
         try {
             $func(...$args);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($this->errorHandler === null) {
                 echo $e;
             } else {

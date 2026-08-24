@@ -12,6 +12,12 @@ declare(strict_types=1);
 
 namespace Workerman\Events;
 
+use EventBase;
+use RuntimeException;
+use Throwable;
+use function class_exists;
+use function count;
+
 /**
  * libevent eventloop
  */
@@ -20,9 +26,9 @@ final class Event implements EventInterface
     /**
      * Event base.
      *
-     * @var \EventBase
+     * @var EventBase
      */
-    private \EventBase $eventBase;
+    private EventBase $eventBase;
 
     /**
      * All listeners for read event.
@@ -76,13 +82,13 @@ final class Event implements EventInterface
      */
     public function __construct()
     {
-        if (\class_exists('\\\\Event', false)) {
+        if (class_exists('\\\\Event', false)) {
             $className = '\\\\Event';
         } else {
             $className = '\Event';
         }
         $this->eventClassName = $className;
-        if (\class_exists('\\\\EventBase', false)) {
+        if (class_exists('\\\\EventBase', false)) {
             $className = '\\\\EventBase';
         } else {
             $className = '\EventBase';
@@ -102,7 +108,7 @@ final class Event implements EventInterface
             $this->safeCall($func, $args);
         });
         if (!$event->addTimer($delay)) {
-            throw new \RuntimeException("Event::addTimer($delay) failed");
+            throw new RuntimeException("Event::addTimer($delay) failed");
         }
         $this->eventTimer[$timerId] = $event;
         return $timerId;
@@ -138,7 +144,7 @@ final class Event implements EventInterface
         $timerId = $this->timerId++;
         $event = new $className($this->eventBase, -1, $className::TIMEOUT | $className::PERSIST, $func);
         if (!$event->addTimer($interval)) {
-            throw new \RuntimeException("Event::addTimer($interval) failed");
+            throw new RuntimeException("Event::addTimer($interval) failed");
         }
         $this->eventTimer[$timerId] = $event;
         return $timerId;
@@ -257,7 +263,7 @@ final class Event implements EventInterface
      */
     public function getTimerCount(): int
     {
-        return \count($this->eventTimer);
+        return count($this->eventTimer);
     }
 
     /**
@@ -277,7 +283,7 @@ final class Event implements EventInterface
     {
         try {
             $func(...$args);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($this->errorHandler === null) {
                 echo $e;
             } else {

@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Workerman\Events;
 
+use Throwable;
+
 interface EventInterface
 {
     /**
@@ -132,7 +134,7 @@ interface EventInterface
     /**
      * Set error handler.
      *
-     * @param  callable(\Throwable): void $errorHandler
+     * @param callable(Throwable): void $errorHandler
      * @return void
      */
     public function setErrorHandler(callable $errorHandler): void;

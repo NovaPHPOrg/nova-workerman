@@ -29,7 +29,7 @@ if (!function_exists('header')) {
         // 处理普通 header
         $parts = explode(':', $string, 2);
         if (count($parts) !== 2) {
-            throw new \InvalidArgumentException('Invalid header format');
+            throw new InvalidArgumentException('Invalid header format');
         }
         [$key, $value] = $parts;
         WorkermanApp::instance()->header(trim($key), trim($value));
@@ -42,7 +42,7 @@ if (!function_exists('header')) {
 if (!function_exists('header_remove')) {
     function header_remove($name = null): void
     {
-        throw new \RuntimeException('header_remove() not support');
+        throw new RuntimeException('header_remove() not support');
     }
 }
 

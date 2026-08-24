@@ -14,8 +14,8 @@ namespace nova\plugin\workerman\adapter;
 
 use nova\framework\App;
 use nova\framework\core\Context;
-use nova\framework\core\Loader;
 use RuntimeException;
+use Throwable;
 use Workerman\Connection\TcpConnection;
 use Workerman\Protocols\Http\Request;
 use Workerman\Protocols\Http\Response;
@@ -193,7 +193,7 @@ class WorkermanApp
                 $this->session = new WorkermanSession();
             }
             return $this->session;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // 记录异常信息
             error_log("Session creation failed: " . $e->getMessage());
             return null;

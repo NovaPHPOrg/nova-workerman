@@ -12,6 +12,11 @@ declare(strict_types=1);
 
 namespace Workerman\Events;
 
+use EvIo;
+use EvSignal;
+use EvTimer;
+use Throwable;
+
 /**
  * Ev eventloop
  */
@@ -20,28 +25,28 @@ final class Ev implements EventInterface
     /**
      * All listeners for read event.
      *
-     * @var array<int, \EvIo>
+     * @var array<int, EvIo>
      */
     private array $readEvents = [];
 
     /**
      * All listeners for write event.
      *
-     * @var array<int, \EvIo>
+     * @var array<int, EvIo>
      */
     private array $writeEvents = [];
 
     /**
      * Event listeners of signal.
      *
-     * @var array<int, \EvSignal>
+     * @var array<int, EvSignal>
      */
     private array $eventSignal = [];
 
     /**
      * All timer event listeners.
      *
-     * @var array<int, \EvTimer>
+     * @var array<int, EvTimer>
      */
     private array $eventTimer = [];
 
@@ -63,7 +68,7 @@ final class Ev implements EventInterface
     public function delay(float $delay, callable $func, array $args = []): int
     {
         $timerId = self::$timerId;
-        $event = new \EvTimer($delay, 0, function () use ($func, $args, $timerId) {
+        $event = new EvTimer($delay, 0, function () use ($func, $args, $timerId) {
             unset($this->eventTimer[$timerId]);
             $this->safeCall($func, $args);
         });
@@ -97,7 +102,7 @@ final class Ev implements EventInterface
      */
     public function repeat(float $interval, callable $func, array $args = []): int
     {
-        $event = new \EvTimer($interval, $interval, fn () => $this->safeCall($func, $args));
+        $event = new EvTimer($interval, $interval, fn() => $this->safeCall($func, $args));
         $this->eventTimer[self::$timerId] = $event;
         return self::$timerId++;
     }
@@ -108,7 +113,7 @@ final class Ev implements EventInterface
     public function onReadable($stream, callable $func): void
     {
         $fdKey = (int)$stream;
-        $event = new \EvIo($stream, \Ev::READ, fn () => $this->safeCall($func, [$stream]));
+        $event = new EvIo($stream, \Ev::READ, fn() => $this->safeCall($func, [$stream]));
         $this->readEvents[$fdKey] = $event;
     }
 
@@ -132,7 +137,7 @@ final class Ev implements EventInterface
     public function onWritable($stream, callable $func): void
     {
         $fdKey = (int)$stream;
-        $event = new \EvIo($stream, \Ev::WRITE, fn () => $this->safeCall($func, [$stream]));
+        $event = new EvIo($stream, \Ev::WRITE, fn() => $this->safeCall($func, [$stream]));
         $this->writeEvents[$fdKey] = $event;
     }
 
@@ -155,7 +160,7 @@ final class Ev implements EventInterface
      */
     public function onSignal(int $signal, callable $func): void
     {
-        $event = new \EvSignal($signal, fn () => $this->safeCall($func, [$signal]));
+        $event = new EvSignal($signal, fn() => $this->safeCall($func, [$signal]));
         $this->eventSignal[$signal] = $event;
     }
 
@@ -224,7 +229,7 @@ final class Ev implements EventInterface
     {
         try {
             $func(...$args);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($this->errorHandler === null) {
                 echo $e;
             } else {
