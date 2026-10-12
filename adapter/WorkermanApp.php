@@ -126,13 +126,13 @@ class WorkermanApp
 
     /**
      * 设置 Cookie
-     * @param string $name               Cookie 名称
-     * @param string $value              Cookie 值
-     * @param int|null $maxAge            存活秒数，null 为会话 Cookie
-     * @param string   $path             Cookie 路径
-     * @param string   $domain           Cookie 域名
-     * @param bool     $secure           是否仅通过 HTTPS 传输
-     * @param bool     $httponly         是否仅允许 HTTP 访问
+     * @param string   $name     Cookie 名称
+     * @param string   $value    Cookie 值
+     * @param int|null $maxAge   存活秒数，null 为会话 Cookie
+     * @param string   $path     Cookie 路径
+     * @param string   $domain   Cookie 域名
+     * @param bool     $secure   是否仅通过 HTTPS 传输
+     * @param bool     $httponly 是否仅允许 HTTP 访问
      */
     public function cookie(string $name, string $value, ?int $maxAge, string $path, string $domain, bool $secure, bool $httponly): void
     {
