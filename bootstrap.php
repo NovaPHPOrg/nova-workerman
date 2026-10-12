@@ -62,6 +62,9 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
         // 每秒检查一次文件修改时间
         Timer::add(1, function () use (&$file_mtime_map) {
             $monitor_dir = dirname(__DIR__, 3) . "/";
+            // config.php 每个请求都会重新读盘，且运行中会被业务写入；
+            // 若因它 reload，正在执行后台任务的 worker 会在 stopTimeout 后被强杀
+            $config_file = realpath($monitor_dir . "config.php");
             // 递归遍历目录
             $dir_iterator = new RecursiveDirectoryIterator($monitor_dir, FilesystemIterator::SKIP_DOTS);
             $iterator = new RecursiveIteratorIterator($dir_iterator);
@@ -79,7 +82,7 @@ $http_worker->onWorkerStart = function ($worker) use ($config) {
                 }
 
                 $file_path = $file->getRealPath(); // 获取完整路径
-                if ($file_path === false) {
+                if ($file_path === false || $file_path === $config_file) {
                     continue;
                 }
                 // SplFileInfo 可能吃到 stat 缓存，热更场景必须清

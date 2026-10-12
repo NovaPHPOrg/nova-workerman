@@ -128,15 +128,15 @@ class WorkermanApp
      * 设置 Cookie
      * @param string $name               Cookie 名称
      * @param string $value              Cookie 值
-     * @param int    $expires_or_options 过期时间或选项
-     * @param string $path               Cookie 路径
-     * @param string $domain             Cookie 域名
-     * @param bool   $secure             是否仅通过 HTTPS 传输
-     * @param bool   $httponly           是否仅允许 HTTP 访问
+     * @param int|null $maxAge            存活秒数，null 为会话 Cookie
+     * @param string   $path             Cookie 路径
+     * @param string   $domain           Cookie 域名
+     * @param bool     $secure           是否仅通过 HTTPS 传输
+     * @param bool     $httponly         是否仅允许 HTTP 访问
      */
-    public function cookie(string $name, string $value, int $expires_or_options, string $path, string $domain, bool $secure, bool $httponly): void
+    public function cookie(string $name, string $value, ?int $maxAge, string $path, string $domain, bool $secure, bool $httponly): void
     {
-        $this->response->cookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
+        $this->response->cookie($name, $value, $maxAge, $path, $domain, $secure, $httponly);
     }
 
     /**
@@ -198,11 +198,6 @@ class WorkermanApp
             error_log("Session creation failed: " . $e->getMessage());
             return null;
         }
-    }
-
-    public function sendResponse(): void
-    {
-        $this->connection->send($this->response->withBody(ob_get_contents() ?: ""));
     }
 
     public function sendSSE(array $data): void

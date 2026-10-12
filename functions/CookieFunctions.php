@@ -21,8 +21,9 @@ use nova\plugin\workerman\adapter\WorkermanApp;
 if (!function_exists('setcookie')) {
     function setcookie(string $name, string $value = "", int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false): bool
     {
-
-        WorkermanApp::instance()->cookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
+        // PHP 传绝对过期时间（0 = 会话 Cookie），Workerman 要的是 Max-Age 秒数
+        $maxAge = $expires_or_options === 0 ? null : max(0, $expires_or_options - time());
+        WorkermanApp::instance()->cookie($name, $value, $maxAge, $path, $domain, $secure, $httponly);
         return true;
     }
 }

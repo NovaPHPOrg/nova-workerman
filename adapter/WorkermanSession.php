@@ -85,7 +85,7 @@ class WorkermanSession
             setcookie(
                 $this->sessionName,
                 $this->sessionId,
-                time() + $this->options['lifetime'],
+                $this->options['lifetime'] > 0 ? time() + $this->options['lifetime'] : 0,
                 $this->options['path'],
                 $this->options['domain'],
                 $this->options['secure'],

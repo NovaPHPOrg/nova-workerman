@@ -28,27 +28,26 @@ class Adapter
     public static function InitServerVar(Request $request): void
     {
         $dir  = dirname(__DIR__, 3);
-        $hostname = gethostname();
+        // Workerman 只监听明文 HTTP，HTTPS 由反代终结后经 X-Forwarded-Proto 判断，这里不设 HTTPS
         $_SERVER = [
             "PHP_SELF" =>  "$dir/public/index.php",
             "SCRIPT_NAME" => "/index.php",
             "GATEWAY_INTERFACE" => "CGI/1.1",
-            "SERVER_ADDR" => gethostbyname($hostname),
-            "SERVER_NAME" => $hostname,
+            "SERVER_ADDR" => $request->connection->getLocalIp(),
+            "SERVER_NAME" => gethostname(),
             "SERVER_SOFTWARE" => "workerman",
             "SERVER_PROTOCOL" => $request->protocolVersion(),
             "REQUEST_METHOD" => $request->method(),
             "REQUEST_TIME" => time(),
             "REQUEST_TIME_FLOAT" => microtime(true),
-            "QUERY_STRING" => parse_url($request->uri(), PHP_URL_QUERY),
+            "QUERY_STRING" => $request->queryString(),
             "DOCUMENT_ROOT" => "$dir/public",
-            "HTTPS" => str_starts_with($request->uri(), 'https') ? 'on' : '',
-            "REMOTE_ADDR" => $request->connection->getRemoteAddress(),
+            "REMOTE_ADDR" => $request->connection->getRemoteIp(),
             "REMOTE_HOST" => $request->connection->getRemoteIp(),
             "REMOTE_PORT" => $request->connection->getRemotePort(),
             "REMOTE_USER" => "",
             "REDIRECT_REMOTE_USER" => "",
-            "SCRIPT_FILENAME" => __DIR__ . "$dir/public/index.php",
+            "SCRIPT_FILENAME" => "$dir/public/index.php",
             "SERVER_ADMIN" => "",
             "SERVER_PORT" => $request->connection->getLocalPort(),
             "SERVER_SIGNATURE" => "",

@@ -23,16 +23,17 @@ class WorkermanResponse extends Response
         if ($this->isHead()) {
             return;
         }
-        WorkermanApp::instance()->sendResponse();
+        $app = WorkermanApp::instance();
+        // Workerman 对 event-stream 只输出头部，头部结束的空行必须由 body 提供
+        $app->connection()->send($app->response()->withBody("\r\n"));
         $callback(function ($data, $event = null) {
-            if ($data == null) {
+            if ($data === null) {
                 return;
             }
             WorkermanApp::instance()->sendSSE(['data' => $data, 'event' => $event ?? 'message']);
         });
-        while (!connection_aborted()) {
-            sleep(1);
-        }
+        // 回调执行期间事件循环被阻塞，连接状态不会更新；流结束就主动关闭，不能在这里等客户端断开
+        $app->connection()->close();
     }
 
     /**
