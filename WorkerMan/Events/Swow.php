@@ -16,8 +16,10 @@ use RuntimeException;
 use Swow\Coroutine;
 use Swow\Signal;
 use Swow\SignalException;
-use Throwable;
+
 use function Swow\Sync\waitAll;
+
+use Throwable;
 
 final class Swow implements EventInterface
 {

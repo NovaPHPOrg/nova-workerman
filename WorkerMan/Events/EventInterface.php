@@ -134,7 +134,7 @@ interface EventInterface
     /**
      * Set error handler.
      *
-     * @param callable(Throwable): void $errorHandler
+     * @param  callable(Throwable): void $errorHandler
      * @return void
      */
     public function setErrorHandler(callable $errorHandler): void;

@@ -12,11 +12,12 @@ declare(strict_types=1);
 
 namespace Workerman\Events;
 
+use function class_exists;
+use function count;
+
 use EventBase;
 use RuntimeException;
 use Throwable;
-use function class_exists;
-use function count;
 
 /**
  * libevent eventloop
